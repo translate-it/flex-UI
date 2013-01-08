@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"  
+				title="Send mail" showCloseButton="true"  backgroundAlpha="1.0"
+				creationComplete="initializeMe()"
+				height="390" xmlns:user="com.amadeus.ori.translate.ui.user.*" xmlns:userservice="services.userservice.*" xmlns:components="com.amadeus.ori.translate.ui.components.*" width="703" label=" ">
+
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.validators.Validator;
+			
+			import valueObjects.User;
+			
+			[Bindable]
+			public var userList:ArrayCollection;	
+			
+			private function initializeMe():void
+			{
+				PopUpManager.centerPopUp(this);
+				this.addEventListener("close", close);
+				messageSubject.setFocus();
+				
+			}
+			
+			public function close(event:Event):void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function send():void
+			{
+				
+				if(Validator.validateAll(validators).length == 0){ 
+					
+					//make a CSV list of all receipients
+					var receipients:String = "";					
+					for each(var user:User in messageReceipients.selectedItems){
+					    if(user.email != null){
+							receipients += user.email + ",";
+						}
+					}
+					
+					sendMailResult.token = userService.sendMail(FlexGlobals.topLevelApplication.engineBaseUrl, messageSubject.text, messageText.text, receipients);	
+				} else {
+					message.checkFormFields();
+				} 
+				
+			}			
+			
+			
+
+			protected function sendMailResult_resultHandler(event:ResultEvent):void
+			{
+//TODO check the message and display		
+				Alert.show("Mail was sent!");
+				close(null);
+			}
+
+
+
+			protected function selectAll_clickHandler(event:MouseEvent):void
+			{
+
+				var victor:Vector.<int> = new Vector.<int>();
+				
+				for(var i:int=0;i<userList.length;i++){
+					victor.push(i);
+				}
+				
+				messageReceipients.selectedIndices = victor;
+			}
+
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<fx:Array id="validators">		
+			<mx:StringValidator  source="{messageSubject}" property="text" required="true" minLength="4" trigger="{btnSend}"/>
+			<mx:StringValidator  source="{messageText}" property="text" required="true" minLength="10" trigger="{btnSend}"/>
+			<mx:NumberValidator  source="{messageReceipients}" property="selectedIndex" minValue="0" trigger="{btnSend}" 
+				triggerEvent     ="click"  				
+				lowerThanMinError="At least one receipient must be selected!" />			
+		</fx:Array>	
+		<s:CallResponder id="sendMailResult" result="sendMailResult_resultHandler(event)"
+						 fault="{message.errorMessage = event.fault.content.toString()}"/>
+		<userservice:UserService id="userService" showBusyCursor="true"/>
+	</fx:Declarations>
+	
+	<mx:HBox width="100%" height="337">
+			
+		
+		<mx:Form id="mailform" paddingLeft="10" width="70%">
+			<components:FormMessage  id="message" />
+			<mx:FormItem label="Subject"  fontWeight="bold">
+				<mx:TextInput id="messageSubject" width="386" />
+			</mx:FormItem>
+			<mx:FormItem label="Content" fontWeight="bold">
+				<mx:TextArea  id="messageText" width="386" height="198"/>
+			</mx:FormItem>
+			
+			<mx:Spacer height="10"/>
+			
+			<mx:FormItem>
+				<mx:HBox>
+					<mx:Button label="send" click="{send()}" id="btnSend"/>
+					<mx:Button label="cancel" click="{close(null)}" id="btnClose" />
+				</mx:HBox>
+			</mx:FormItem>
+		</mx:Form> 	
+		<mx:VBox height="100%" width="30%" paddingBottom="20">
+			<mx:Spacer height="10"/>
+			<s:HGroup width="191" height="29" verticalAlign="middle">
+				<s:Label text="Receipients:" height="25" verticalAlign="middle" fontWeight="bold"/>
+				<s:Button label="select all" id="selectAll"  click="selectAll_clickHandler(event)"/>
+			</s:HGroup>
+			<s:List dataProvider="{userList}" labelField="email" id="messageReceipients" height="100%" width="95%" allowMultipleSelection="true">
+			</s:List>			
+		</mx:VBox>
+	</mx:HBox>
+
+</mx:TitleWindow>

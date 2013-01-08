@@ -1,0 +1,1327 @@
+
+<model xmlns="http://ns.adobe.com/Fiber/1.0">
+  <annotation name="ActionScriptGeneration">
+    <item name="FullyQualifyReferences">true</item>
+  </annotation>
+  <entity name="CreateUserResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">CreateUserResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">UserService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="createUser">
+      <item name="propertySpecifier">user</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_CreateUserResultEntityMetadata.as~#~valueObjects/_Super_CreateUserResult.as~#~valueObjects/CreateUserResult.as~#~</item>
+    </annotation>
+    <property name="user" type="User" required="true"/>
+  </entity>
+  <entity name="Date_type">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Date_type</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">LogEntryService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_Date_typeEntityMetadata.as~#~valueObjects/_Super_Date_type.as~#~valueObjects/Date_type.as~#~</item>
+    </annotation>
+    <property name="time" type="long" required="true" default="0"/>
+    <property name="minutes" type="integer" required="true"/>
+    <property name="seconds" type="integer" required="true"/>
+    <property name="hours" type="integer" required="true"/>
+    <property name="month" type="integer" required="true"/>
+    <property name="year" type="integer" required="true"/>
+    <property name="timezoneOffset" type="integer" required="true"/>
+    <property name="day" type="integer" required="true"/>
+    <property name="date" type="integer" required="true"/>
+  </entity>
+  <entity name="Bundle">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Bundle</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_BundleEntityMetadata.as~#~valueObjects/_Super_Bundle.as~#~valueObjects/Bundle.as~#~</item>
+    </annotation>
+    <property name="id" type="string" required="true"/>
+    <property name="defaultBundle" type="boolean" required="true"/>
+    <property name="description" type="string" required="true"/>
+    <property name="name" type="string" required="true"/>
+    <property name="global" type="boolean" required="true"/>
+    <property name="projectId" type="string" required="true"/>
+  </entity>
+  <entity name="ListBundleResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">ListBundleResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="listBundles">
+      <item name="propertySpecifier">bundle</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_ListBundleResultEntityMetadata.as~#~valueObjects/_Super_ListBundleResult.as~#~valueObjects/ListBundleResult.as~#~</item>
+    </annotation>
+    <property name="bundle" type="Bundle[]" required="true"/>
+  </entity>
+  <entity name="BundleResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">BundleResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="addBundle">
+      <item name="propertySpecifier">bundle</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_BundleResultEntityMetadata.as~#~valueObjects/_Super_BundleResult.as~#~valueObjects/BundleResult.as~#~</item>
+    </annotation>
+    <property name="bundle" type="Bundle" required="true"/>
+  </entity>
+  <entity name="Key">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Key</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">LogEntryService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_KeyEntityMetadata.as~#~valueObjects/_Super_Key.as~#~valueObjects/Key.as~#~</item>
+    </annotation>
+    <property name="id" type="integer" required="true"/>
+    <property name="complete" type="boolean" required="true"/>
+    <property name="name" type="string" required="true"/>
+    <property name="parent" type="opaque" required="true"/>
+    <property name="kind" type="string" required="true"/>
+  </entity>
+  <service name="ImportService">
+    <annotation name="ActionScriptGeneration">
+      <item name="ServiceType">HTTPMultiService</item>
+      <item name="Package">services.importservice</item>
+      <item name="rootURL">http://{ENGINE_BASE_URL}</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">services/importservice/_Super_ImportService.as~#~services/importservice/ImportService.as~#~</item>
+    </annotation>
+    <annotation name="ServiceTypeGroup">
+      <item name="ServiceBackendType">HTTPService</item>
+    </annotation>
+    <annotation name="ServiceConfig">
+      <item name="DEFAULT_ENTITY_PACKAGE">valueObjects</item>
+      <item name="LINKED_FILE"></item>
+    </annotation>
+    <function name="addTranslation" return-type="ImportTranslationResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/admin/import/addTranslation</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/import/addTranslation?keyValue=IMPORT&amp;translationValue=Import&amp;language=de&amp;bundle=cmt</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,keyValue,translationValue,language,bundle,projectId</item>
+        <item name="inputParams">string,string,string,string,string,string</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">adminResult</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="keyValue" type="string"/>
+      <parameter name="translationValue" type="string"/>
+      <parameter name="language" type="string"/>
+      <parameter name="bundle" type="string"/>
+      <parameter name="projectId" type="string"/>
+    </function>
+  </service>
+  <entity name="ImportTranslationResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">ImportTranslationResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">ImportService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="addTranslation">
+      <item name="propertySpecifier">adminResult</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_ImportTranslationResultEntityMetadata.as~#~valueObjects/_Super_ImportTranslationResult.as~#~valueObjects/ImportTranslationResult.as~#~</item>
+    </annotation>
+    <property name="adminResult" type="AdminResult" required="true"/>
+  </entity>
+  <service name="UserService">
+    <annotation name="ActionScriptGeneration">
+      <item name="ServiceType">HTTPMultiService</item>
+      <item name="Package">services.userservice</item>
+      <item name="rootURL">http://{ENGINE_BASE_URL}/process/</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">services/userservice/_Super_UserService.as~#~services/userservice/UserService.as~#~</item>
+    </annotation>
+    <annotation name="ServiceTypeGroup">
+      <item name="ServiceBackendType">HTTPService</item>
+    </annotation>
+    <annotation name="ServiceConfig">
+      <item name="DEFAULT_ENTITY_PACKAGE">valueObjects</item>
+      <item name="LINKED_FILE"></item>
+    </annotation>
+    <function name="createUser" return-type="UserResult">
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ActionScriptGeneration">
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+        <item name="method">GET</item>
+        <item name="url">admin/createUser</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/createUser?username=bob&amp;password=huhu&amp;isGoogleAccount=true</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">user</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,username,password,isGoogleAccount</item>
+        <item name="inputParams">string,string,string,string</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="username" type="string"/>
+      <parameter name="password" type="string"/>
+      <parameter name="isGoogleAccount" type="string"/>
+    </function>
+    <function name="listUsers" return-type="ListUsersResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">admin/listUsers</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/listUsers</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL</item>
+        <item name="inputParams">string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">user</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+    </function>
+    <function name="updateUser" return-type="UserResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">admin/updateUser</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/updateUser?username=bob&amp;password=bob&amp;firstName=blabla&amp;lastName=blabla&amp;email=blabla&amp;languages=blabla&amp;isEnabled=true&amp;isAdmin=false</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,username,password,firstName,lastName,email,languages,isEnabled,isAdmin</item>
+        <item name="inputParams">string,string,string,string,string,string,string,string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">user</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="username" type="string"/>
+      <parameter name="password" type="string"/>
+      <parameter name="firstName" type="string"/>
+      <parameter name="lastName" type="string"/>
+      <parameter name="email" type="string"/>
+      <parameter name="languages" type="string"/>
+      <parameter name="isEnabled" type="string"/>
+      <parameter name="isAdmin" type="string"/>
+    </function>
+    <function name="deleteUser" return-type="DeleteUserResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">admin/deleteUser</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/deleteUser?username=bob</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,username</item>
+        <item name="inputParams">string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">adminResult</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="username" type="string"/>
+    </function>
+    <function name="sendMail" return-type="AdminResult">
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ActionScriptGeneration">
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+        <item name="method">GET</item>
+        <item name="url">admin/sendMail</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/sendMail?subject=test&amp;message=testmessage&amp;receipients=toby@sunnymail.mobi</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">adminResult</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="inputParamNames">ENGINE_BASE_URL,subject,message,receipients</item>
+        <item name="inputParams">string,string,string,string</item>
+        <item name="returnType">opaque</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="subject" type="string"/>
+      <parameter name="message" type="string"/>
+      <parameter name="receipients" type="string"/>
+    </function>
+  </service>
+  <entity name="User">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">User</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">UserService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_Super_User.as~#~valueObjects/_UserEntityMetadata.as~#~valueObjects/User.as~#~</item>
+    </annotation>
+    <property name="admin" type="boolean" required="true"/>
+    <property name="countries" type="string" required="true"/>
+    <property name="password" type="string" required="true"/>
+    <property name="lastName" type="string" required="true"/>
+    <property name="languages" type="string" required="true"/>
+    <property name="enabled" type="boolean" required="true"/>
+    <property name="username" type="string" required="true"/>
+    <property name="email" type="string" required="true"/>
+    <property name="bundles" type="string" required="true"/>
+    <property name="role" type="string" required="true"/>
+    <property name="firstName" type="string" required="true"/>
+    <property name="googleAccount" type="boolean" required="true"/>
+  </entity>
+  <entity name="Users">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Users</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">UserService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_Super_Users.as~#~valueObjects/_UsersEntityMetadata.as~#~valueObjects/Users.as~#~</item>
+    </annotation>
+    <property name="admin" type="boolean" required="true"/>
+    <property name="countries" type="string" required="true"/>
+    <property name="lastName" type="string" required="true"/>
+    <property name="languages" type="string" required="true"/>
+    <property name="enabled" type="boolean" required="true"/>
+    <property name="username" type="string" required="true"/>
+    <property name="email" type="string" required="true"/>
+    <property name="bundles" type="string" required="true"/>
+    <property name="role" type="string" required="true"/>
+    <property name="firstName" type="string" required="true"/>
+    <property name="password" type="string" required="true"/>
+    <property name="googleAccount" type="boolean" required="true"/>
+  </entity>
+  <entity name="DeleteUserResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">DeleteUserResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">UserService,ImportService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="deleteUser">
+      <item name="propertySpecifier">adminResult</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_DeleteUserResultEntityMetadata.as~#~valueObjects/_Super_DeleteUserResult.as~#~valueObjects/DeleteUserResult.as~#~</item>
+    </annotation>
+    <annotation name="addTranslation">
+      <item name="propertySpecifier">adminResult</item>
+    </annotation>
+    <property name="adminResult" type="AdminResult" required="true"/>
+  </entity>
+  <entity name="UserResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">UserResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">UserService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="updateUser">
+      <item name="propertySpecifier">user</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_Super_UserResult.as~#~valueObjects/_UserResultEntityMetadata.as~#~valueObjects/UserResult.as~#~</item>
+    </annotation>
+    <annotation name="createUser">
+      <item name="propertySpecifier">user</item>
+    </annotation>
+    <property name="user" type="User" required="true"/>
+  </entity>
+  <entity name="ListUsersResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">ListUsersResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">UserService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="listUsers">
+      <item name="propertySpecifier">user</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_ListUsersResultEntityMetadata.as~#~valueObjects/_Super_ListUsersResult.as~#~valueObjects/ListUsersResult.as~#~</item>
+    </annotation>
+    <property name="users" type="Users[]" required="true"/>
+    <property name="user" type="User[]" required="true"/>
+  </entity>
+  <service name="LogEntryService">
+    <annotation name="ActionScriptGeneration">
+      <item name="ServiceType">HTTPMultiService</item>
+      <item name="Package">services.logentryservice</item>
+      <item name="rootURL">http://{ENGINE_BASE_URL}/process/</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">services/logentryservice/_Super_LogEntryService.as~#~services/logentryservice/LogEntryService.as~#~</item>
+    </annotation>
+    <annotation name="ServiceTypeGroup">
+      <item name="ServiceBackendType">HTTPService</item>
+    </annotation>
+    <annotation name="ServiceConfig">
+      <item name="DEFAULT_ENTITY_PACKAGE">valueObjects</item>
+      <item name="LINKED_FILE"></item>
+    </annotation>
+    <function name="listLogEntries" return-type="LogEntryResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">admin/listLogEntries</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/listLogEntries</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL</item>
+        <item name="inputParams">string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">logEntry</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+    </function>
+  </service>
+  <entity name="LogEntryResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">LogEntryResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">LogEntryService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="listLogEntries">
+      <item name="propertySpecifier">logEntry</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_LogEntryResultEntityMetadata.as~#~valueObjects/_Super_LogEntryResult.as~#~valueObjects/LogEntryResult.as~#~</item>
+    </annotation>
+    <property name="logEntry" type="LogEntry[]" required="true"/>
+  </entity>
+  <entity name="LogEntry">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">LogEntry</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">LogEntryService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_LogEntryEntityMetadata.as~#~valueObjects/_Super_LogEntry.as~#~valueObjects/LogEntry.as~#~</item>
+    </annotation>
+    <property name="message" type="string" required="true"/>
+    <property name="important" type="boolean" required="true"/>
+    <property name="date" type="string" required="true"/>
+    <property name="key" type="integer" required="true"/>
+  </entity>
+  <service name="TranslationService">
+    <annotation name="ActionScriptGeneration">
+      <item name="ServiceType">HTTPMultiService</item>
+      <item name="Package">services.translationservice</item>
+      <item name="rootURL">http://{ENGINE_BASE_URL}</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">services/translationservice/_Super_TranslationService.as~#~services/translationservice/TranslationService.as~#~</item>
+    </annotation>
+    <annotation name="ServiceTypeGroup">
+      <item name="ServiceBackendType">HTTPService</item>
+    </annotation>
+    <annotation name="ServiceConfig">
+      <item name="DEFAULT_ENTITY_PACKAGE">valueObjects</item>
+      <item name="LINKED_FILE"></item>
+    </annotation>
+    <function name="addKeyword" return-type="KeywordResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/admin/translate/addKeyword</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/translate/addKeyword?bundleId=cmt.testbundle&amp;keyValue=AABBC&amp;context=blabla&amp;defaultTranslation=aa-bbc</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,bundleId,keyValue,context,defaultTranslation,projectId</item>
+        <item name="inputParams">string,string,string,string,string,string</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">keyword</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="bundleId" type="string"/>
+      <parameter name="keyValue" type="string"/>
+      <parameter name="context" type="string"/>
+      <parameter name="defaultTranslation" type="string"/>
+      <parameter name="projectId" type="string"/>
+    </function>
+    <function name="list" return-type="KeywordTranslationList">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/translate/list</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/translate/list?language=de_DE&amp;sourceLanguage=en&amp;index=0</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,language,sourceLanguage,index</item>
+        <item name="inputParams">string,string,string,string</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">keywordTranslation</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="language" type="string"/>
+      <parameter name="sourceLanguage" type="string"/>
+      <parameter name="index" type="string"/>
+    </function>
+    <function name="setTranslation" return-type="TranslationResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">POST</item>
+        <item name="url">/process/translate/setTranslation</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+        <item name="contentType">application/x-www-form-urlencoded</item>
+        <item name="requestBodyParameter">false</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/translate/setTranslation?keywordId=cmt.testbundle.AABBC&amp;value=AABinDeutsch&amp;language=de_DE&amp;validated=true</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,keywordId,value,language,validated</item>
+        <item name="inputParams">string,string,string,string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">translation</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="keywordId" type="string"/>
+      <parameter name="value" type="string"/>
+      <parameter name="language" type="string"/>
+      <parameter name="validated" type="string"/>
+    </function>
+    <function name="deleteKeyword" return-type="DeleteKeywordResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/admin/translate/deleteKeyword</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/translate/deleteKeyword?keywordId=cmt.testbundle.AABBC</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,keywordId</item>
+        <item name="inputParams">string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">adminResult</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="keywordId" type="string"/>
+    </function>
+  </service>
+  <entity name="Translation">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Translation</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService,ImportService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_Super_Translation.as~#~valueObjects/_TranslationEntityMetadata.as~#~valueObjects/Translation.as~#~</item>
+    </annotation>
+    <property name="id" type="string" required="true"/>
+    <property name="value" type="string" required="true"/>
+    <property name="bundle" type="string" required="true"/>
+    <property name="language" type="string" required="true"/>
+    <property name="keywordId" type="string" required="true"/>
+    <property name="validated" type="boolean" required="true"/>
+  </entity>
+  <entity name="Keyword">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Keyword</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_KeywordEntityMetadata.as~#~valueObjects/_Super_Keyword.as~#~valueObjects/Keyword.as~#~</item>
+    </annotation>
+    <property name="id" type="string" required="true"/>
+    <property name="context" type="string" required="true"/>
+    <property name="defaultTranslation" type="string" required="true"/>
+    <property name="keyValue" type="string" required="true"/>
+  </entity>
+  <entity name="KeywordResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">KeywordResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="addKeyword">
+      <item name="propertySpecifier">keyword</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_KeywordResultEntityMetadata.as~#~valueObjects/_Super_KeywordResult.as~#~valueObjects/KeywordResult.as~#~</item>
+    </annotation>
+    <property name="keyword" type="Keyword" required="true"/>
+  </entity>
+  <entity name="DeleteKeywordResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">DeleteKeywordResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="deleteKeyword">
+      <item name="propertySpecifier">adminResult</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_DeleteKeywordResultEntityMetadata.as~#~valueObjects/_Super_DeleteKeywordResult.as~#~valueObjects/DeleteKeywordResult.as~#~</item>
+    </annotation>
+    <property name="adminResult" type="AdminResult" required="true"/>
+  </entity>
+  <entity name="KeywordTranslation">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">KeywordTranslation</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_KeywordTranslationEntityMetadata.as~#~valueObjects/_Super_KeywordTranslation.as~#~valueObjects/KeywordTranslation.as~#~</item>
+    </annotation>
+    <property name="defaultTranslation" type="string" required="true"/>
+    <property name="translationId" type="string" required="true"/>
+    <property name="keyWordId" type="string" required="true"/>
+    <property name="context" type="string" required="true"/>
+    <property name="bundle" type="string" required="true"/>
+    <property name="sourceTranslation" type="string" required="true"/>
+    <property name="translationValue" type="string" required="true"/>
+    <property name="keyValue" type="string" required="true"/>
+  </entity>
+  <entity name="TranslationResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">TranslationResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService,ImportService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="setTranslation">
+      <item name="propertySpecifier">translation</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_Super_TranslationResult.as~#~valueObjects/_TranslationResultEntityMetadata.as~#~valueObjects/TranslationResult.as~#~</item>
+    </annotation>
+    <annotation name="addTranslation">
+      <item name="propertySpecifier">translation</item>
+    </annotation>
+    <property name="translation" type="Translation" required="true"/>
+  </entity>
+  <entity name="KeywordTranslationList">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">KeywordTranslationList</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="list">
+      <item name="propertySpecifier">keywordTranslation</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_KeywordTranslationListEntityMetadata.as~#~valueObjects/_Super_KeywordTranslationList.as~#~valueObjects/KeywordTranslationList.as~#~</item>
+    </annotation>
+    <property name="keywordTranslation" type="KeywordTranslation[]" required="true"/>
+  </entity>
+  <service name="SecurityService">
+    <annotation name="ActionScriptGeneration">
+      <item name="ServiceType">HTTPMultiService</item>
+      <item name="Package">services.securityservice</item>
+      <item name="rootURL">http://{ENGINE_BASE_URL}</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">services/securityservice/_Super_SecurityService.as~#~services/securityservice/SecurityService.as~#~</item>
+    </annotation>
+    <annotation name="ServiceTypeGroup">
+      <item name="ServiceBackendType">HTTPService</item>
+    </annotation>
+    <annotation name="ServiceConfig">
+      <item name="DEFAULT_ENTITY_PACKAGE">valueObjects</item>
+      <item name="LINKED_FILE"></item>
+    </annotation>
+    <function name="getIdentity" return-type="IdentityResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/security/getIdentity</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/security/getIdentity</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL</item>
+        <item name="inputParams">string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">identity</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+    </function>
+    <function name="authenticate" return-type="IdentityResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/security/authenticate</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/security/authenticate?username=bobfoster@mixmail.com&amp;password=foobar</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,username,password</item>
+        <item name="inputParams">string,string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">identity</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="username" type="string"/>
+      <parameter name="password" type="string"/>
+    </function>
+    <function name="logout" return-type="LogoutResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/security/logout</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/security/logout</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL</item>
+        <item name="inputParams">string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">logout</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+    </function>
+    <function name="updateProfile" return-type="IdentityResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">/process/security/updateProfile</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/security/updateProfile?password=bob&amp;firstName=blabla&amp;lastName=blabla&amp;email=blabla</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,password,firstName,lastName,email</item>
+        <item name="inputParams">string,string,string,string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">identity</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="password" type="string"/>
+      <parameter name="firstName" type="string"/>
+      <parameter name="lastName" type="string"/>
+      <parameter name="email" type="string"/>
+    </function>
+  </service>
+  <entity name="IdentityResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">IdentityResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">SecurityService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="getIdentity">
+      <item name="propertySpecifier">identity</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_IdentityResultEntityMetadata.as~#~valueObjects/_Super_IdentityResult.as~#~valueObjects/IdentityResult.as~#~</item>
+    </annotation>
+    <annotation name="authenticate">
+      <item name="propertySpecifier">identity</item>
+    </annotation>
+    <annotation name="updateProfile">
+      <item name="propertySpecifier">identity</item>
+    </annotation>
+    <property name="identity" type="Identity" required="true"/>
+  </entity>
+  <entity name="LogoutResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">LogoutResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">SecurityService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="logout">
+      <item name="propertySpecifier">logout</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_LogoutResultEntityMetadata.as~#~valueObjects/_Super_LogoutResult.as~#~valueObjects/LogoutResult.as~#~</item>
+    </annotation>
+    <property name="logout" type="boolean" required="true"/>
+  </entity>
+  <entity name="Identity">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Identity</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">SecurityService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_IdentityEntityMetadata.as~#~valueObjects/_Super_Identity.as~#~valueObjects/Identity.as~#~</item>
+    </annotation>
+    <property name="password" type="string" required="true"/>
+    <property name="projects" type="string" required="true"/>
+    <property name="lastName" type="string" required="true"/>
+    <property name="languages" type="string" required="true"/>
+    <property name="enabled" type="boolean" required="true"/>
+    <property name="username" type="string" required="true"/>
+    <property name="email" type="string" required="true"/>
+    <property name="bundles" type="string" required="true"/>
+    <property name="role" type="string" required="true"/>
+    <property name="firstName" type="string" required="true"/>
+    <property name="googleAccount" type="boolean" required="true"/>
+  </entity>
+  <service name="ProjectService">
+    <annotation name="ActionScriptGeneration">
+      <item name="ServiceType">HTTPMultiService</item>
+      <item name="Package">services.projectservice</item>
+      <item name="rootURL">http://{ENGINE_BASE_URL}/process/</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">services/projectservice/_Super_ProjectService.as~#~services/projectservice/ProjectService.as~#~</item>
+    </annotation>
+    <annotation name="ServiceTypeGroup">
+      <item name="ServiceBackendType">HTTPService</item>
+    </annotation>
+    <annotation name="ServiceConfig">
+      <item name="DEFAULT_ENTITY_PACKAGE">valueObjects</item>
+      <item name="LINKED_FILE"></item>
+    </annotation>
+    <function name="getProject" return-type="ProjectResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">admin/getProject</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/getProject</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,id</item>
+        <item name="inputParams">string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">project</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="id" type="string"/>
+    </function>
+    <function name="createProject" return-type="ProjectResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">admin/createProject</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/createProject?id=cmt&amp;name=CheckMyTrip&amp;description=none</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,name,description</item>
+        <item name="inputParams">string,string,string</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">project</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="name" type="string"/>
+      <parameter name="description" type="string"/>
+    </function>
+    <function name="updateProject" return-type="ProjectResult">
+      <annotation name="ActionScriptGeneration">
+        <item name="method">GET</item>
+        <item name="url">admin/updateProject</item>
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/updateProject?id=cmt&amp;name=CheckMyTrip&amp;description=none&amp;languages=DE,EN&amp;exportLanguages=EN</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,id,name,description,languages,exportLanguages,bundles</item>
+        <item name="inputParams">string,string,string,string,string,string,string</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">project</item>
+      </annotation>
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="id" type="string"/>
+      <parameter name="name" type="string"/>
+      <parameter name="description" type="string"/>
+      <parameter name="languages" type="string"/>
+      <parameter name="exportLanguages" type="string"/>
+      <parameter name="bundles" type="string"/>
+    </function>
+    <function name="listProjects" return-type="Projects">
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ActionScriptGeneration">
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+        <item name="method">GET</item>
+        <item name="url">listProjects</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/listProjects</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">project</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL</item>
+        <item name="inputParams">string</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+    </function>
+    <function name="deleteProject" return-type="DeleteProjectResult">
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="ActionScriptGeneration">
+        <item name="SerializationFilter">com.adobe.serializers.json.JSONSerializationFilter</item>
+        <item name="method">GET</item>
+        <item name="url">admin/deleteProject</item>
+      </annotation>
+      <annotation name="url group">
+        <item name="completeURL">http://{ENGINE_BASE_URL}/process/admin/deleteProject</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">adminResult</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="returnType">opaque</item>
+        <item name="inputParamNames">ENGINE_BASE_URL,id</item>
+        <item name="inputParams">string,string</item>
+      </annotation>
+      <annotation name="Properties">
+        <item name="urlParamNames">ENGINE_BASE_URL</item>
+      </annotation>
+      <parameter name="ENGINE_BASE_URL" type="string"/>
+      <parameter name="id" type="string"/>
+    </function>
+  </service>
+  <entity name="Projects">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Projects</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">ProjectService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="listProjects">
+      <item name="propertySpecifier">project</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="project" type="Project[]" required="true"/>
+  </entity>
+  <entity name="AdminResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">AdminResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">ProjectService,UserService,ImportService,TranslationService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_AdminResultEntityMetadata.as~#~valueObjects/_Super_AdminResult.as~#~valueObjects/AdminResult.as~#~</item>
+    </annotation>
+    <annotation name="sendMail">
+      <item name="propertySpecifier">adminResult</item>
+    </annotation>
+    <property name="adminResult" type="AdminResult" required="true"/>
+    <property name="message" type="string" required="true"/>
+    <property name="errormsg" type="string" required="true"/>
+    <property name="offset" type="integer" required="true"/>
+  </entity>
+  <entity name="ProjectResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">ProjectResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">ProjectService,ProjectServiceDummy</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="createProject">
+      <item name="propertySpecifier">project</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_ProjectResultEntityMetadata.as~#~valueObjects/_Super_ProjectResult.as~#~valueObjects/ProjectResult.as~#~</item>
+    </annotation>
+    <annotation name="getProject">
+      <item name="propertySpecifier">project</item>
+    </annotation>
+    <annotation name="updateProject">
+      <item name="propertySpecifier">project</item>
+    </annotation>
+    <property name="project" type="Project" required="true"/>
+  </entity>
+  <entity name="DeleteProjectResult">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">DeleteProjectResult</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">ProjectService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="deleteProject">
+      <item name="propertySpecifier">adminResult</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="adminResult" type="AdminResult" required="true"/>
+  </entity>
+  <entity name="Project">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Project</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">ProjectService</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="ASFilesGenerated">
+      <item name="ASFilesGenerated">valueObjects/_ProjectEntityMetadata.as~#~valueObjects/_Super_Project.as~#~valueObjects/Project.as~#~</item>
+    </annotation>
+    <property name="id" type="string" required="true"/>
+    <property name="languages" type="string" required="true"/>
+    <property name="enabled" type="boolean" required="true"/>
+    <property name="exportLanguages" type="string" required="true"/>
+    <property name="bundles" type="string" required="true"/>
+    <property name="description" type="string" required="true"/>
+    <property name="name" type="string" required="true"/>
+  </entity>
+</model>

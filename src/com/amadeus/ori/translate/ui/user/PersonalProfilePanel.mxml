@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group  width="100%" height="100%" 
+		  xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"  
+		  xmlns:useristrationservices="services.useristrationservices.*" 
+		  xmlns:userservice="services.userservice.*" 
+		  xmlns:valueObjects="valueObjects.*"
+		  xmlns:components="com.amadeus.ori.translate.ui.components.*" 
+		  xmlns:user="com.amadeus.ori.translate.ui.user.*" 
+		  xmlns:securityservice="services.securityservice.*">
+
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.SHA256;
+			import mx.validators.Validator;
+			
+			import valueObjects.Identity;
+			import valueObjects.IdentityResult;
+			
+			[Bindable]
+			public var identity:Identity;
+			
+
+			protected function btnSave_clickHandler(event:MouseEvent):void
+			{
+				if(Validator.validateAll(validators).length == 0){ 				
+					
+
+					var password:String = password1.text;
+					
+					if(password != ""){
+						var bytes:ByteArray = new ByteArray();
+						bytes.writeMultiByte(password, "iso-8859-1");
+						password = SHA256.computeDigest(bytes);					
+					}
+					
+					updateProfileResult.token = securityService.updateProfile(
+						FlexGlobals.topLevelApplication.engineBaseUrl,
+						password,
+						inputFirstName.text,
+						inputLastName.text,
+						inputEmail.text);
+					
+					password1.text = "";
+					password2.text = "";
+					
+				} else {
+					message.checkFormFields();
+				} 
+				
+			}
+
+
+			protected function updateProfileResult_resultHandler(event:ResultEvent):void
+			{
+				var idres:IdentityResult = event.result as IdentityResult;
+				if((idres != null)&&(idres.identity != null)){
+					this.identity = idres.identity; 
+					message.message = "Profile has been updated.";
+				}
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<securityservice:SecurityService id="securityService" 
+										 fault="{message.errorMessage = event.fault.content.toString()}" showBusyCursor="true"/>		
+		<s:CallResponder id="updateProfileResult" result="updateProfileResult_resultHandler(event)"/>
+		
+		<fx:Array id="validators">			
+			<mx:StringValidator  source="{password1}" property="text" required="{password1.text.length > 0}" minLength="4" trigger="{btnSave}"/>
+			<user:PasswordValidator id="pwvPasswords" required="{password1.text.length > 0}" source="{password1}" property="text" confirmationSource="{password2}" confirmationProperty="text" trigger="{btnSave}" />
+			<mx:EmailValidator  source="{inputEmail}" property="text" required="true" trigger="{btnSave}"/>	
+		</fx:Array>	
+	</fx:Declarations>
+
+	<s:Form id="form" horizontalCenter="0" >
+
+		<s:FormHeading label="Your Account" />
+		
+		<s:FormItem label="Username">
+			<s:TextInput text="{identity.username}" id="inputUsername" width="200" enabled="false" fontWeight="bold"/>
+		</s:FormItem>
+		
+		<s:FormItem label="First Name">
+			<s:TextInput text="{identity.firstName}" id="inputFirstName" width="200"/>
+		</s:FormItem>
+		
+		<s:FormItem label="Last Name">
+			<s:TextInput text="{identity.lastName}" id="inputLastName" width="200"/>
+		</s:FormItem>			
+		
+		<s:FormItem label="E-Mail Address">
+			<s:TextInput text="{identity.email}" id="inputEmail" width="200"/>
+		</s:FormItem>
+
+		<s:FormItem visible="{identity.googleAccount}" includeInLayout="{identity.googleAccount}"
+					 label="Google Account" fontWeight="bold">
+			<s:Image source="@Embed(source='/assets/gaccounts_small.png')"/>			
+		</s:FormItem>	
+		
+		<s:FormItem visible="{!identity.googleAccount}" includeInLayout="{!identity.googleAccount}" label="New Password">
+			<s:TextInput text="" id="password1" width="200" displayAsPassword="true"/>
+		</s:FormItem>	
+		<s:FormItem visible="{!identity.googleAccount}" includeInLayout="{!identity.googleAccount}" label="New Password (repeated)">
+			<s:TextInput text="" id="password2" width="200" displayAsPassword="true"/>
+		</s:FormItem>		
+		
+		<s:FormItem>
+			<s:HGroup>
+				<s:Button id="btnSave" label="save" fontWeight="bold" click="btnSave_clickHandler(event)"/>
+				<components:FormMessage id="message"/>
+			</s:HGroup>
+			
+		</s:FormItem>
+	</s:Form>
+</s:Group>

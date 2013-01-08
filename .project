@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>translate-it-flex</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.adobe.flexbuilder.project.flexbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.adobe.flexbuilder.project.flexnature</nature>
+		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>bin-debug</name>
+			<type>2</type>
+			<location>C:/Users/admin/Documents/GitHub/translate-it/translate-it/war/flex_debug</location>
+		</link>
+		<link>
+			<name>bin-release</name>
+			<type>2</type>
+			<location>D:/Documents/workspace-flash/translate-it/war/flex</location>
+		</link>
+		<link>
+			<name>bin-release1</name>
+			<type>2</type>
+			<location>C:/Users/admin/Documents/GitHub/translate-it/translate-it/war/flex</location>
+		</link>
+		<link>
+			<name>bin-release2</name>
+			<type>2</type>
+			<location>C:/Users/admin/Documents/GitHub/translate-it/translate-it/war/translate-it-flex</location>
+		</link>
+	</linkedResources>
+</projectDescription>

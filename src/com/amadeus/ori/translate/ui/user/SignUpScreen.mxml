@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<components:PopUp title="Create account" showCloseButton="true" xmlns:mx="http://www.adobe.com/2006/mxml"  backgroundAlpha="1.0"
+				  width="450" height="400" xmlns:components="com.tripworx.ui.components.*"
+				  creationComplete="{username.setFocus()}" 
+				  xmlns:validators="com.tripworx.validators.*">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.validators.Validator;
+			import com.tripworx.domain.Organization;
+			import com.tripworx.domain.User;
+			import mx.controls.Alert;
+
+
+
+			private function signUp():void
+			{
+				
+				if(Validator.validateAll(validators).length == 0){ 
+					
+					var o:Organization = new Organization();
+						o.name = organization.text;
+	
+					var u:User = new User();
+					u.username = username.text;
+					u.password = password1.text;
+					u.foreName = foreName.text;
+					u.surName = surName.text; 
+	
+				}
+			}
+			
+
+			public function showWelcome():void
+			{
+				Alert.show("Your account has been created!","Welcome");
+				close(null);
+			}
+
+
+//			private function setValidationFocus(formObject:Object):void
+//			{
+//				formObject.setFocus();
+//				formObject.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_OVER));
+//			}
+		]]>
+	</mx:Script>
+	<mx:Style>
+        .warning {
+            color : red;
+        }
+    </mx:Style>
+
+	<mx:Array id="validators">		
+		<mx:EmailValidator  source="{username}" property="text" required="true" trigger="{btnSignUp}"/>
+		<mx:StringValidator  source="{password1}" property="text" required="true" minLength="4" trigger="{btnSignUp}"/>
+		<validators:PasswordValidator id="pwvPasswords" required="true" source="{password1}" property="text" confirmationSource="{password2}" confirmationProperty="text" trigger="{btnSignUp}" />
+				
+	</mx:Array>
+
+
+	<mx:Form id="signupform" width="100%" paddingLeft="100">
+		<mx:FormHeading label="Register Now!"/>
+
+		<mx:FormItem>
+			<mx:Text id="message" styleName="warning"/>
+		</mx:FormItem>
+		<mx:FormItem label="E-mail address" fontWeight="bold">
+			<mx:TextInput id="username" width="100%" />
+		</mx:FormItem>
+		<mx:FormItem label="Create a password" fontWeight="bold">
+			<mx:TextInput id="password1" width="100%" displayAsPassword="true" />
+		</mx:FormItem>
+		<mx:FormItem label="Retype password" fontWeight="bold">
+			<mx:TextInput id="password2" width="100%" displayAsPassword="true" />
+		</mx:FormItem>
+		<mx:FormItem label="Company or oranization">
+			<mx:TextInput id="organization" width="100%"/>
+		</mx:FormItem>
+		<mx:Spacer height="20"/>
+		<mx:FormItem label="First name">
+			<mx:TextInput id="foreName" width="100%"/>
+		</mx:FormItem>
+		<mx:FormItem label="Last name">
+			<mx:TextInput id="surName" width="100%"/>
+		</mx:FormItem>
+		<mx:FormItem label="{resourceManager.getString('resources', 'LOGIN.LANGUAGE')}">
+			<mx:ComboBox id="localeComboBox" change="changeLocale()" enabled="false">
+				<mx:Array>
+					<mx:Object value="en_US" label="English"/>
+					<mx:Object value="de_DE" label="Deutsch"/>
+				</mx:Array>
+
+			</mx:ComboBox>
+
+		</mx:FormItem>
+		<mx:Spacer height="20"/>
+
+		<mx:FormItem>
+			<mx:HBox>
+				<mx:Button label="sign-up" click="{signUp()}" id="btnSignUp" />
+				<mx:Button label="close" click="{close(null)}" id="btnClose" />
+			</mx:HBox>
+		</mx:FormItem>
+	</mx:Form>
+</components:PopUp>

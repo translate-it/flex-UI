@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%"
+		  creationComplete="creationCompleteHandler(event)" 
+		  xmlns:components="com.amadeus.ori.translate.ui.components.*" 
+		  xmlns:translationservice="services.translationservice.*" horizontalAlign="center" xmlns:importservice="services.importservice.*" gap="2" paddingTop="5" xmlns:projectservice="services.projectservice.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSONDecoder;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import valueObjects.Project;
+			
+			[Bindable]
+			private var _project:Project;
+			
+			[Bindable]
+			private var projectsList:ArrayCollection;	
+			
+			[Bindable]
+			public var languages:Array = null;
+			
+			private var fileRef:FileReference;			
+			
+			
+			private const FILE_UPLOAD_URL:String = "http://"+FlexGlobals.topLevelApplication.engineBaseUrl+"/process/admin/import/loadFile";
+			
+			private static const delimiters:ArrayCollection = new ArrayCollection(new Array("=", ",", "."));
+			private var doneWithUpload:Boolean;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				listProjects();
+				
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.SELECT, fileRef_select);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, fileRef_progress);
+				fileRef.addEventListener(Event.COMPLETE, fileRef_complete);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileRef_uploadComplete);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, fileRef_error);
+			}
+			
+			protected function listProjects(event:Event=null):void
+			{
+				listProjectsResult.token = projectService.listProjects(FlexGlobals.topLevelApplication.engineBaseUrl);
+			}
+			
+			protected function listProjectsResult_resultHandler(event:ResultEvent):void
+			{
+				projectsList = listProjectsResult.lastResult.project;
+				
+				if (projectsList ==  null || projectsList.length < 1) 
+				{
+					Alert.show("Please configure at least one project first.");
+				} else {
+					
+//					project = Project(projectsList.getItemAt(0));
+				}
+				
+			}
+			
+			
+			protected function projectSelectBox_changeHandler(event:IndexChangeEvent):void
+			{
+				if (event.newIndex != event.oldIndex) 
+				{
+					project = Project(projectSelectBox.selectedItem);
+				}
+				
+			}
+			
+			private function set project(project:Project):void
+			{
+				this._project = project;
+				languages = project.languages.split(",");
+				if (languages ==  null || languages.length < 1) 
+				{
+					Alert.show("Please configure at least one language for this project.");
+				} 
+			}
+			
+			
+			private function fileRef_error(evt:Event):void{
+				message.errorMessage = "ERROR: file upload failed";
+				currentState = "state1";
+			}
+			
+			private function fileRef_uploadComplete(evt:DataEvent):void {
+				
+				trace(evt.data);
+				var decoder:JSONDecoder = new JSONDecoder(evt.data);
+				previewGrid.dataProvider = decoder.getValue().contents;
+				currentState = "state3";
+				message.message = "check preview below, select a language and hit the import button";
+			}
+			
+			
+			
+			private function fileRef_select(evt:Event):void {
+				try {
+					message.message = fileRef.name + " size: " + numberFormatter.format(fileRef.size) + "bytes";
+					fileRef.upload(new URLRequest(FILE_UPLOAD_URL + "?delimiter=" + delimiter.selectedItem));
+					currentState = "state2";
+				} catch (err:Error) {
+					message.errorMessage = "ERROR: zero-byte file";					
+				}
+			}
+			
+			private function fileRef_progress(evt:ProgressEvent):void {
+				//progressBar.visible = true;
+			}
+			
+			private function fileRef_complete(evt:Event):void {
+				//	message.message = "file load success";
+				currentState = "state3";
+			}
+			
+			
+			private function btnSelectFile_clickHandler(event:MouseEvent):void {
+				message.reset();		
+				fileRef.browse();						
+			}			
+			
+			
+			
+			protected function btnImportAll_clickHandler(event:MouseEvent):void
+			{
+				var language:String = languageSelectBox.language;
+				var bundle:String =  bundleList.selectedItem;
+				
+				if(language == null){
+					message.errorMessage = "You have to select a language!";
+				} else if(bundle == null){
+					message.errorMessage = "You have to select a bundle!";
+				} else {
+					this.doneWithUpload = false;
+					var i:int = 0;
+					for each (var entry:Object in previewGrid.dataProvider){
+						i++;
+						
+						if((entry.keyValue != "")&&(entry.translationValue != "")){
+							addTranslationResult.token = importService.addTranslation(FlexGlobals.topLevelApplication.engineBaseUrl, entry.keyValue, entry.translationValue, language, bundle, _project.id);							
+						}	
+						if(i==previewGrid.rowCount){
+							this.doneWithUpload = true;
+						}
+					} 										
+				}
+				
+			}
+			
+			
+			protected function addTranslationResult_resultHandler(event:ResultEvent):void
+			{
+				if(doneWithUpload == true){
+					currentState = "state1";
+					message.message = "All entries have been imported. You can import another file.";
+					previewGrid.dataProvider = new ArrayList();
+					languageSelectBox.language = "00"; 
+					stage.dispatchEvent(new TranslationEvent(TranslationEvent.TRANSLATIONS_UPDATED));
+				}
+			}
+			
+			
+			protected function addTranslationResult_faultHandler(event:FaultEvent):void
+			{
+				// TODO Auto-generated method stub
+			}
+			
+		]]>
+		
+	</fx:Script>
+	<s:states>
+		<s:State id="state1" name="state1" />
+		<s:State id="state2" name="state2" />
+		<s:State id="state3" name="state3" />
+	</s:states>
+	
+	<fx:Declarations>	
+		
+		<mx:NumberFormatter id="numberFormatter" />
+		<translationservice:TranslationService id="translationService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<s:CallResponder id="addTranslationResult" result="addTranslationResult_resultHandler(event)" fault="addTranslationResult_faultHandler(event)"/>
+		<importservice:ImportService id="importService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		
+		<projectservice:ProjectService id="projectService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<s:CallResponder id="listProjectsResult" result="listProjectsResult_resultHandler(event)"/>
+	</fx:Declarations>
+	
+	
+	<s:HGroup verticalAlign="middle" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">	
+		
+		<!-- 1. SELECT THE FILE and DELIMITER -->
+		<s:Label fontWeight="bold" text="Field delimiter" includeIn="state1"/>			
+		<s:ComboBox dataProvider="{delimiters}" id="delimiter" width="60" includeIn="state1"/>
+		<s:Button label="select a file" id="btnSelectFile"  click="btnSelectFile_clickHandler(event)"  fontWeight="bold" includeIn="state1"/>
+		
+		<!-- 2. WAIT DURING UPLOAD -->
+		<s:Label id="fileinfoLabel" text="uploading ... size 234" includeIn="state2"/>
+		<mx:ProgressBar id="progressBar" indeterminate="true" visible="true" includeIn="state2"/>	
+		<s:Label id="progressLabel" text="10%" includeIn="state2"/>
+		
+		
+		<!-- 3. SELECT PROJECT, BUNDLE AND LANGUAGE -->
+		<s:Label fontWeight="bold" text="Project" includeIn="state3"/>
+		<s:ComboBox id="projectSelectBox" dataProvider="{projectsList}" labelField="name" change="projectSelectBox_changeHandler(event)" includeIn="state3"/>
+		
+		<s:Label fontWeight="bold" text="Bundle" includeIn="state3"/>
+		<s:ComboBox id="bundleList" dataProvider="{_project.bundleList}" labelField="name" includeIn="state3"/>
+		
+		<s:Label fontWeight="bold" text="Language" includeIn="state3"/>
+		<components:LanguageSelectBox id="languageSelectBox" languages="{languages}" width="100%"  language="00" includeIn="state3"/>
+		
+		<s:Button label="import all" id="btnImportAll"  fontWeight="bold" click="btnImportAll_clickHandler(event)"  includeIn="state3" />
+		<s:Button label="cancel" id="btnReset"  click="{currentState='state1'}"  includeIn="state3" />
+		
+	</s:HGroup>				
+	
+	<components:MessageBox  id="message" />
+	
+	<mx:DataGrid id="previewGrid" width="100%" height="100%" includeIn="state3" />
+	<mx:VBox width="100%" height="100%" horizontalAlign="center" includeIn="state1" backgroundColor="#F9F9F9" color="#666666">
+		<mx:Spacer height="5" />
+		<s:Label  text="You can import simple text files for each language. They must have the following format:"/>
+		<s:Label fontWeight="bold" text="keyDELIMITERvalue"/>
+		<s:Label  text="You can choose the delimiter in the drop-down box."/>
+		<mx:Image  source="assets/screenshot_csv_file.png" alpha="0.5"/>
+		<s:Label  text="the figure above shows an example" fontStyle="italic"/>
+	</mx:VBox>
+</s:VGroup>

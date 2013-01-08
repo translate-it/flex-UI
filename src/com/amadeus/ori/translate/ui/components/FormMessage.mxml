@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:FormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="creationCompleteHandler(event)" >
+	<mx:states>
+		<s:State name="default" />
+		<s:State name="error" />
+		<s:State name="success" />		
+	</mx:states>
+	<fx:Declarations>
+
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			private var rendercount:int = 0;
+			
+			public function set errorMessage(message:String):void{
+				currentState = 'error';
+				_errorText.text = message;
+				rendercount = 0;
+			}
+
+			public function checkFormFields():void{
+				currentState = 'error';
+				_errorText.text = "Please check the highlighted fields.";
+				rendercount = 0;
+			}
+			
+			public function set message(message:String):void{
+				currentState = 'success';
+				_messageText.text = message;
+				rendercount = 0;
+			}	
+			
+			public function reset():void{
+				currentState = 'default';
+				//errorText.text = messageText.text = "";
+			}
+			
+			public function rerender(event:Event=null):void{
+				
+				if(rendercount > 4){
+					//remove the message after a while
+					currentState = 'default';
+				} else {
+					rendercount++;
+				}
+		
+			}
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				this.addEventListener(Event.RENDER, rerender);
+			}
+
+		]]>
+	</fx:Script>
+	<mx:HBox verticalAlign="middle" height="100%">
+		<s:Label id="_errorText" includeIn="error" color="red" fontWeight="bold" text="error"/>
+		<s:Label id="_messageText" includeIn="success" color="blue" fontWeight="bold" text="success"/>				
+	</mx:HBox>
+
+</mx:FormItem>

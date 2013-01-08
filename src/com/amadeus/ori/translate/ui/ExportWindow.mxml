@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"  
+				title="Export {project.name}"
+				creationComplete="initializeMe()"
+				xmlns:components="com.amadeus.ori.translate.ui.components.*" 
+				xmlns:translationservice="services.translationservice.*">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import valueObjects.Project;
+			
+			[Bindable]
+			public var project:Project;
+			
+			private function initializeMe():void
+			{
+				PopUpManager.centerPopUp(this);
+				this.addEventListener("close", close);
+			}
+			
+			public function close(event:Event):void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function createPackage():void
+			{
+				var url:String = "http://" + FlexGlobals.topLevelApplication.engineBaseUrl;
+				
+				if(typeXLIFF.selected){
+					url += "/process/export/iphone?bundle=" + bundleList.selectedItem.name + "&projectId=" + project.id;
+				}else if(typeAMAK.selected){						
+				     //export fo iphone
+				     url += "/process/export/package?projectId=" + project.id;
+				}else if(typeIOS.selected){						
+					 url += "/process/export/xliff?bundle=" + bundleList.selectedItem.name + "&projectId=" + project.id;
+				}	
+				navigateToURL(new URLRequest(url));
+			    close(null);
+			}			
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<translationservice:TranslationService id="translationService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<s:CallResponder id="listBundlesResult" />	
+	</fx:Declarations>
+	
+	<s:Form id="exportform">
+		<s:FormItem label="File Type" fontWeight="bold">
+			<s:HGroup>				
+				<s:VGroup>
+					<s:RadioButton id="typeXLIFF" label="XLIFF" groupName="type" selected="true" />
+					<s:RadioButton id="typeAMAK" label="AMAK" groupName="type"/>
+					<s:RadioButton id="typeIOS" label="iOS"  groupName="type"   />					
+				</s:VGroup>
+			</s:HGroup>					
+		</s:FormItem>
+		<s:FormItem label="Bundle" visible="{!typeAMAK.selected}" fontWeight="bold">
+			<s:ComboBox 	id="bundleList" 							
+							dataProvider="{project.bundleList}" 
+							labelField="name" height="23" selectedIndex="1"/>
+		</s:FormItem>
+		
+		<s:FormItem>
+			<s:HGroup>
+				<s:Button label="create" click="{createPackage()}" id="btnCreatePackage"/>
+				<s:Button label="cancel" click="{close(null)}" id="btnClose" />
+			</s:HGroup>
+		</s:FormItem>
+	</s:Form> 
+</s:TitleWindow>

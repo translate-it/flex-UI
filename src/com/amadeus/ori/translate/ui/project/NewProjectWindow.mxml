@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"  
+				title="Create Project" 
+				creationComplete="initializeMe()"
+				xmlns:project="com.amadeus.ori.translate.ui.project.*" 
+				xmlns:projectservice="services.projectservice.*" 
+				xmlns:components="com.amadeus.ori.translate.ui.components.*">
+
+	<fx:Metadata>
+		/**
+		 *  Dispatched when the new project has been created
+		 *
+		 *  @eventType com.amadeus.ori.translate.ui.project.ProjectEvent.NEW_PROJECT_CREATED
+		 */
+		[Event(name="newProjectCreated", type="com.amadeus.ori.translate.ui.project.ProjectEvent")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.validators.Validator;
+			
+			private function initializeMe():void
+			{
+				PopUpManager.centerPopUp(this);
+				this.addEventListener("close", close);
+				projectName.setFocus()
+			}
+			
+			public function close(event:Event):void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function createProject():void
+			{
+				
+				if(Validator.validateAll(validators).length == 0){ 
+					
+					
+					createProjectResult.token = projectService.createProject(FlexGlobals.topLevelApplication.engineBaseUrl, projectName.text, projectDescription.text);	
+				} else {
+					message.checkFormFields();
+				} 
+				
+			}			
+			
+			
+
+			protected function createProjectResult_resultHandler(event:ResultEvent):void
+			{
+				stage.dispatchEvent(new ProjectEvent(ProjectEvent.PROJECTS_UPDATED));				
+				close(null);
+			}
+
+
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<fx:Array id="validators">
+			<mx:StringValidator source="{projectName}" property="text" required="true" minLength="4" trigger="{btnCreateProject}"/>
+		</fx:Array>	
+		<s:CallResponder id="createProjectResult" result="createProjectResult_resultHandler(event)"
+						 fault="{message.errorMessage = event.fault.content.toString()}"/>
+		<projectservice:ProjectService id="projectService" showBusyCursor="true"/>
+	</fx:Declarations>
+	
+	<s:Form>
+
+		<s:FormItem label="Name" required="true">
+			<s:TextInput id="projectName" />
+		</s:FormItem>
+		
+		<s:FormItem label="Description" >
+			<s:TextArea id="projectDescription" heightInLines="3" />
+		</s:FormItem>
+		
+		<s:Spacer height="10"/>
+		
+		<s:FormItem>
+			<s:HGroup>
+				<s:Button label="create" click="{createProject()}" id="btnCreateProject"/>
+				<s:Button label="cancel" click="{close(null)}" id="btnClose" />
+				<components:FormMessage  id="message" />
+			</s:HGroup>
+		</s:FormItem>
+	</s:Form> 
+</s:TitleWindow>

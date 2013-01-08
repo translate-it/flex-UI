@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"  
+			   title="Translate" 
+			   creationComplete="initializeMe()"				
+			   xmlns:user="com.amadeus.ori.translate.ui.user.*"  
+			   xmlns:components="com.amadeus.ori.translate.ui.components.*" 
+			   xmlns:translationservice="services.translationservice.*"
+			   
+			   xmlns:googletranslate="services.googletranslate.*">
+	
+	<fx:Metadata>
+		/**
+		*  Dispatched when the new user has been created
+		*
+		*  @eventType com.amadeus.ori.translate.ui.user.UserEvent.NEW_USER_CREATED
+		*/
+		[Event(name="translationUpdated", type="com.amadeus.ori.translate.ui.TranslationEvent")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSONDecoder;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.CursorManager;
+			import mx.managers.PopUpManager;
+			
+			
+			
+			public var language:String = "en";
+			
+			public var sourceLanguage:String = "en";
+			
+			public var sourceTranslation:String;
+			
+			[Bindable]
+			public var row:Object;
+			
+			private var translationListLoader:URLLoader ;
+			
+			private function initializeMe():void
+			{
+				PopUpManager.centerPopUp(this);
+				this.addEventListener("close", close);
+				
+				textAreaSource.text = sourceTranslation;
+				
+				
+				translationListLoader = new URLLoader();
+				
+				translationListLoader.addEventListener(IOErrorEvent.IO_ERROR,listResult_errorHandler);
+				translationListLoader.addEventListener(Event.COMPLETE,listResult_resultHandler); 	
+				var query:String = escape(sourceTranslation);
+				
+				//				translationListLoader.load(new URLRequest("http://" + FlexGlobals.topLevelApplication.engineBaseUrl + "/process/translate/askGoogle?query="+query+"&language="+language+"&source="+sourceLanguage));
+				
+			}
+			
+			protected function listResult_errorHandler(event:Event):void
+			{	
+				CursorManager.removeBusyCursor();
+				Alert.show("An error occured while loading the translation from Google translate.");
+			}
+			
+			protected function listResult_resultHandler(event:Event):void
+			{								
+				var decoder:JSONDecoder = new JSONDecoder(translationListLoader.data);
+				textAreaTranslation.text = decoder.getValue().data.translations[0].translatedText;
+				
+			}
+			
+			public function close(event:Event):void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function insert():void
+			{
+				
+				var te:TranslationEvent = new TranslationEvent(TranslationEvent.TRANSLATION_UPDATED, textAreaTranslation.text);
+				dispatchEvent(te);
+				close(null);
+			}			
+			
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	<s:Form width="100%" height="100%">
+		<s:Label text="This feature is currently not available" color="#FF0000"  fontWeight="bold"/>
+		<s:FormItem label="Source Text" fontWeight="bold">
+			<s:TextArea height="58" width="100%" id="textAreaSource" editable="false"/>
+		</s:FormItem>
+		<s:FormItem label="Google Translate">
+			<s:TextArea height="90" width="100%" id="textAreaTranslation" />
+		</s:FormItem>
+		<s:FormItem>
+			<s:HGroup>
+				<s:Button label="insert" click="{insert()}" id="btnInsert"/>
+				<s:Button label="cancel" click="{close(null)}" id="btnClose" />
+			</s:HGroup>
+		</s:FormItem>		
+	</s:Form>
+	
+</s:TitleWindow>

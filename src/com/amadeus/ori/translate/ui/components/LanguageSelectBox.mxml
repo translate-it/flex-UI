@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ComboBox xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx" 
+			 dataProvider="{languageCodes}"  
+			 labelFunction="getLanguageName"  
+			 selectedIndex="0">
+	
+	
+	<fx:Metadata>
+		[ResourceBundle("languages")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.utils.StringUtil;
+			
+			[Bindable]
+			private static var languageCodes:ArrayCollection = new ArrayCollection(new Array("en","af","sq","eu","be","bg","ca","zh-cn","zh-tw","hr","cs","da","nl","nl-be","nl-nl","en","en-au","en-bz","en-ca","en-ie","en-jm","en-nz","en-ph","en-za","en-tt","en-gb","en-us","en-zw","et","fo","fi","fr","fr-be","fr-ca","fr-fr","fr-lu","fr-mc","fr-ch","gl","gd","de","de-at","de-de","de-li","de-lu","de-ch","el","haw","hu","is","id","ga","it","it-it","it-ch","ja","ko","lv","lt","mk","no","pl","pt","pt-br","pt-pt","ro","ro-mo","ro-ro","ru","ru-mo","ru-ru","sr","sk","sl","es","es-ar","es-bo","es-cl","es-co","es-cr","es-do","es-ec","es-sv","es-gt","es-hn","es-mx","es-ni","es-pa","es-py","es-pe","es-pr","es-es","es-uy","es-ve","sv","sv-fi","sv-se","tr","uk"));
+
+			
+			
+			public function set language(v:String):void{
+				
+				
+				
+				if((v==null)||(v=="")){
+					this.selectedIndex = 0;
+					return;
+				}
+				if(v=="00"){
+					selectedIndex = -1;
+				}
+				for ( var i:Number=0; i<dataProvider.length; i++ )  { 
+					if(dataProvider[i].toString() == v){
+						this.selectedIndex = i;
+						return;
+					} 				
+				}
+			}
+			
+			public function  get language():String{
+				if(this.selectedItem == null){
+					return null;
+				}else{
+				 	return this.selectedItem.toString();
+				}
+
+			}
+			
+			public function set languages(languages:Array):void{
+				
+				if((languages != null)&&(languages.length > 0)&&(languages[0] != null)){		
+					
+					var tmpItem:Object = selectedItem;
+					
+					dataProvider = new ArrayCollection(languages);		
+//					this.rowCount = languages.length;
+					
+					
+					
+					for ( var i:Number=0; i<dataProvider.length; i++ )  { 
+						if(dataProvider[i].toString() == tmpItem){
+							this.selectedIndex = i;
+							return;
+						} 				
+					}
+					
+				}
+
+			}
+			
+			
+			
+			private function getLanguageName(item:Object):String {
+				return StringUtil.substitute("{1} - {0}", resourceManager.getString("languages", item.toString()) , item.toString());
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+</s:ComboBox>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"  
+				title="Create user" backgroundAlpha="1.0"
+				creationComplete="initializeMe()"
+				xmlns:user="com.amadeus.ori.translate.ui.user.*" 
+				xmlns:userservice="services.userservice.*" 
+				xmlns:components="com.amadeus.ori.translate.ui.components.*">
+
+	<fx:Metadata>
+		/**
+		 *  Dispatched when the new user has been created
+		 *
+		 *  @eventType com.amadeus.ori.translate.ui.user.UserEvent.NEW_USER_CREATED
+		 */
+		[Event(name="newUserCreated", type="com.amadeus.ori.translate.ui.user.UserEvent")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.SHA256;
+			import mx.validators.Validator;
+			
+			private function initializeMe():void
+			{
+				PopUpManager.centerPopUp(this);
+				this.addEventListener("close", close);
+				username.setFocus()
+			}
+			
+			public function close(event:Event):void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function createUser():void
+			{
+				
+				if(Validator.validateAll(validators).length == 0){ 
+					
+					var pwd:String = null;
+					
+					if(!radioGoogleAccount.selected){						
+						//encode the password as SHA256
+						var bytes:ByteArray = new ByteArray();
+						bytes.writeMultiByte(password1.text, "iso-8859-1");
+						pwd = SHA256.computeDigest(bytes);	
+					}
+					
+					createUserResult.token = userService.createUser(FlexGlobals.topLevelApplication.engineBaseUrl, username.text, pwd, radioGoogleAccount.selected.toString());	
+				} else {
+					message.checkFormFields();
+				} 
+				
+			}			
+			
+			
+
+			protected function createUserResult_resultHandler(event:ResultEvent):void
+			{
+				dispatchEvent(new UserEvent(UserEvent.NEW_USER_CREATED));					
+				close(null);
+			}
+
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<fx:Array id="validators">		
+			<mx:EmailValidator  source="{username}" property="text" required="true" trigger="{btnCreateUser}"/>	
+			<mx:StringValidator  source="{password1}" property="text" required="{!radioGoogleAccount.selected}" minLength="4" trigger="{btnCreateUser}"/>
+			<user:PasswordValidator id="pwvPasswords" required="{!radioGoogleAccount.selected}" source="{password1}" property="text" confirmationSource="{password2}" confirmationProperty="text" trigger="{btnCreateUser}" />						
+		</fx:Array>	
+		<s:CallResponder id="createUserResult" result="createUserResult_resultHandler(event)"
+						 fault="{message.errorMessage = event.fault.content.toString()}"/>
+		<userservice:UserService id="userService" showBusyCursor="true"/>
+	</fx:Declarations>
+	
+	<s:Form id="signupform" >
+		<s:FormItem label="E-mail address"  required="true">
+			<s:TextInput id="username" width="100%" />
+		</s:FormItem>
+		
+		<s:FormItem label="Google account?" >
+			<s:HGroup>
+				<s:Image source="@Embed(source='/assets/gaccounts_small.png')" />
+				<s:VGroup>
+					<s:RadioButton id="radioGoogleAccount" label="yes" groupName="googleAccount"  />
+					<s:RadioButton label="no"  groupName="googleAccount"  selected="true" />					
+				</s:VGroup>
+			</s:HGroup>					
+		</s:FormItem>
+		<s:FormItem visible="{radioGoogleAccount.selected}" includeInLayout="{radioGoogleAccount.selected}">
+			<s:Label text="No password is needed"/>
+			<s:Label text="if you use a google account."/>
+		</s:FormItem>		
+		<s:FormItem label="Password (1)" visible="{!radioGoogleAccount.selected}" required="{!radioGoogleAccount.selected}">
+			<s:TextInput id="password1" width="100%" displayAsPassword="true"/>
+		</s:FormItem>
+		<s:FormItem label="Password (2)" visible="{!radioGoogleAccount.selected}" required="{!radioGoogleAccount.selected}">
+			<s:TextInput id="password2" width="100%" displayAsPassword="true"/>
+		</s:FormItem>
+		
+		<s:Spacer height="10"/>
+		
+		<s:FormItem>
+			<s:HGroup>
+				<s:Button label="create" click="{createUser()}" id="btnCreateUser"/>
+				<s:Button label="cancel" click="{close(null)}" id="btnClose" />
+				<components:FormMessage  id="message" />
+			</s:HGroup>
+		</s:FormItem>
+	</s:Form> 
+</s:TitleWindow>

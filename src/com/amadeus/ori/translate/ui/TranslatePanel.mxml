@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 width="100%" height="100%"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:components="com.amadeus.ori.translate.ui.components.*"
+		 xmlns:translationservice="services.translationservice.*" 		 
+		 xmlns:preloader="com.amadeus.ori.translate.ui.preloader.*" 
+		 xmlns:projectservice="services.projectservice.*"
+		 gap="0" creationComplete="creationCompleteHandler(event)">
+
+	<fx:Metadata>
+		[ResourceBundle("languages")]		
+	</fx:Metadata>
+
+	<s:states>
+		<s:State id="authenticate" name="authenticate" />
+		<s:State id="authenticatedUser"  name="authenticatedUser"/>		
+		<s:State id="authenticatedAdmin"  name="authenticatedAdmin"/>		
+	</s:states>	
+	
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSONDecoder;
+			import com.amadeus.ori.translate.Configuration;
+			import com.amadeus.ori.translate.ui.project.ProjectEvent;
+			
+			import flash.net.URLLoader;
+			import flash.net.URLRequest;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
+			import mx.controls.Alert;
+			import mx.controls.ProgressBarMode;
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			import mx.events.DataGridEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.CursorManager;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.StringUtil;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import valueObjects.Identity;
+			import valueObjects.Project;
+			
+			private var _identity:Identity;
+			
+			[Bindable]
+			public var language:String = "en";
+			[Bindable]
+			public var languageTitle:String = "English";			
+			[Bindable]
+			public var languages:Array = null;
+			
+			[Bindable]
+			public var sourceLanguage:String = "en";
+			[Bindable]
+			public var sourceLanguages:Array = null;
+			
+			[Bindable]
+			private var _project:Project;
+			[Bindable]
+			private var projectsList:ArrayCollection;	
+			
+			[Bindable]
+			private var translationsList:ArrayCollection;
+			private var translationListLoader:URLLoader ;
+			
+			public function set identity( identity:Identity):void{	
+				if(this._identity != null){
+					this._identity = identity;
+					listProjects();	
+				} else {
+					this._identity = identity;
+				}			
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				listProjects();	
+				stage.addEventListener(ProjectEvent.PROJECTS_UPDATED, listProjects);
+				stage.addEventListener(TranslationEvent.TRANSLATIONS_UPDATED, loadTranslations);
+			}
+			
+			protected function listProjects(event:Event=null):void
+			{
+				listProjectsResult.token = projectService.listProjects(FlexGlobals.topLevelApplication.engineBaseUrl);
+			}
+			
+			protected function listProjectsResult_resultHandler(event:ResultEvent):void
+			{
+				projectsList =  listProjectsResult.lastResult.project;
+				
+				if (projectsList ==  null || projectsList.length < 1) 
+				{
+					Alert.show("Please configure at least one project first.");
+				} else {
+				
+					project = Project(projectsList.getItemAt(0));
+					projectSelectBox.selectedIndex = 0;
+					//everything is fine -> prepare the view 
+					loadTranslations();		
+				}
+				
+			}
+			
+			private function set project(project:Project):void
+			{
+				this._project = project;
+				if((_identity.role != "ROLE_ADMIN") && (_identity.languages != "")){
+					languages = _identity.languages.split(",")
+				} else {
+					languages = project.languages.split(",");
+					if (languages ==  null || languages.length < 1) 
+					{
+						Alert.show("Please configure at least one language for this project.");
+						return;
+					} 
+				}
+				
+				language = languages[0];
+			}
+			
+			protected function loadTranslations(event:Event=null):void
+			{
+				if (translationListLoader == null) 
+				{
+					translationListLoader = new URLLoader();
+					
+					translationListLoader.addEventListener(IOErrorEvent.IO_ERROR,listResult_errorHandler);
+					translationListLoader.addEventListener(Event.COMPLETE,listResult_resultHandler);					
+				}
+				
+				translationsList = new ArrayCollection();
+				translationGrid.enabled = false;
+				progressBar.visible = false;
+				message.message = "Please wait a moment while we are loading the data.";				
+//				listResult.token = translationService.list(language, sourceLanguage, indexForLoad);
+				translationListLoader.load(new URLRequest("http://"+FlexGlobals.topLevelApplication.engineBaseUrl+"/process/translate/list?language="+language+"&source="+sourceLanguage+"&projectId="+_project.id));
+				
+				translationGrid.visible = false;
+				languageTitle = StringUtil.substitute("{0} ({1})", resourceManager.getString("languages", language), language)
+//				CursorManager.setBusyCursor();
+
+//				sourceLanguageLabel.text = ;
+			}
+			
+			protected function listResult_errorHandler(event:Event):void
+			{	
+				CursorManager.removeBusyCursor();
+				Alert.show("An error occured while loading the data. Please try the refresh button. If that does not work you need to contact the administrator.");
+			}
+			
+			protected function listResult_resultHandler(event:Event):void
+			{		
+				
+				var decoder:JSONDecoder = new JSONDecoder(translationListLoader.data);
+				var res:ArrayCollection = new ArrayCollection( decoder.getValue().keywordTranslation);
+				
+				if (res != null && res.length > 0) 
+				{
+					translationsList.addAll(res);					
+					//add received data to the Grid
+									
+		//			indexForLoad = indexForLoad + 100;
+					//listResult.token = translationService.list(language, sourceLanguage, indexForLoad);
+				//	translationListLoader.load(new URLRequest("http://"+FlexGlobals.topLevelApplication.engineBaseUrl+"/process/translate/list?language="+language+"&source="+sourceLanguage+"&index="+indexForLoad));
+					
+					//message.message = '.. loaded ' + translationsList.length + ' - still loading ..';
+					message.message = 'Done ' + translationsList.length + ' translations loaded.' ;
+					
+					var dataSortField:SortField = new SortField();
+					dataSortField.name = "translationValue";
+					dataSortField.numeric = false;
+					
+					/* Create the Sort object and add the SortField object created earlier to the array of fields to sort on. */
+					var numericDataSort:Sort = new Sort();
+						numericDataSort.fields = [dataSortField];
+					
+					/* Set the ArrayCollection object's sort property to our custom sort, and refresh the ArrayCollection. */
+						translationsList.sort = numericDataSort;
+						translationsList.refresh();
+
+
+					
+					var countTranslated:int = 0;
+					var countAll:int = 0;
+					for each(var item:Object in translationGrid.dataProvider){
+						
+						if(item.translationValue != ""){
+							countTranslated++;
+						}
+						countAll++;
+					}
+					
+					updateProgressBar(countTranslated, countAll);
+					
+					translationGrid.visible = true;					
+					translationGrid.validateNow();
+					
+					if(search.text.length > 0){
+						matchChanged();
+					}
+				} else {
+					message.message = 'There are no keywords for this project.' ;
+					translationGrid.visible = true;	
+				}
+				
+				translationGrid.enabled = true;
+				CursorManager.removeBusyCursor();
+	
+			}
+			
+			private function updateProgressBar(countTranslated:Number, countAll:Number):void{
+				progressBar.visible = true;				
+				progressBar.maximum = countAll;
+				progressBar.setProgress(countTranslated,countAll);		
+				progressBar.label = Math.round(progressBar.percentComplete) + "% translated";				
+			}	
+			
+
+			public function sourceLanguageSelectBox_changeHandler(event:IndexChangeEvent):void
+			{
+				if (event.newIndex != event.oldIndex){
+					this.sourceLanguage = sourceLanguages[event.newIndex];
+					loadTranslations();
+				}
+
+			}
+
+			public function languageSelectBox_changeHandler(event:IndexChangeEvent):void								
+			{
+				if (event.newIndex != event.oldIndex){
+					this.language = languages[event.newIndex];
+					loadTranslations();
+				}
+
+			}
+			
+			public function saveTranslation(translation:Object):void{
+				
+				setTranslationResult.token = translationService.setTranslation(
+					FlexGlobals.topLevelApplication.engineBaseUrl, 
+					translation.keyWordId , 
+					translation.translationValue, 
+					language, 
+					"true");
+				
+			}
+			public function deleteTranslation(translation:Object):void{
+				
+			}
+			
+
+
+			public function searchGoogleTranslation(row:Object):void{
+				
+				if(sourceLanguage == language){
+					Alert.show("Source and translation languages have to be different.");
+				} else {
+					//open a popup with google translate proposition
+					var w:GoogleTranslateWindow = new GoogleTranslateWindow();	
+						w.sourceTranslation = row.sourceTranslation;
+						w.row = row;
+						w.sourceLanguage = sourceLanguage;
+						w.language = language; 						
+						w.addEventListener(TranslationEvent.TRANSLATION_UPDATED, updateTranslation);
+
+				
+					PopUpManager.addPopUp(w, this, true);
+				}
+			}
+			
+			public function updateTranslation(event:TranslationEvent):void{
+				
+				var item:Object = translationsList.getItemAt(translationGrid.selectedIndex);
+					item.translationValue = event.translation;
+				translationsList.setItemAt(item, translationGrid.selectedIndex);	
+				
+				saveTranslation(item);
+				
+			}
+
+			public function askDeleteKeyword(row:Object):void{
+				
+				var alert:Alert = Alert.show("Delete keyword " + row.keyValue + " all associated translations?", "Delete Keyword", Alert.YES | Alert.NO);				
+				alert.addEventListener(CloseEvent.CLOSE, deleteKeyword);
+			}
+			
+			private function deleteKeyword(evt:CloseEvent):void {
+				
+				switch (evt.detail) {
+					case Alert.YES:
+						deleteKeywordResult.token = translationService2.deleteKeyword(FlexGlobals.topLevelApplication.engineBaseUrl, translationGrid.selectedItem.keyWordId);
+						break;
+				}
+			}				
+
+			public function askDeleteBundle(row:Object):void{
+				
+				var alert:Alert = Alert.show("Delete bundle " + row.bundle + " and all associated keywords and translations?", "Delete Bundle", Alert.YES | Alert.NO);				
+				alert.addEventListener(CloseEvent.CLOSE, deleteBundle);
+			}
+			
+			private function deleteBundle(evt:CloseEvent):void {
+				
+				switch (evt.detail) {
+					case Alert.YES:
+						//	deleteBundleResult.token = userService.deleteBundle(selectedItem.username);
+						Alert.show("not implemented");
+						break;
+				}
+			}				
+
+
+			protected function btnAddKey_clickHandler(event:MouseEvent):void
+			{
+				var w:NewKeywordWindow = new NewKeywordWindow();
+					w.project = _project;
+					w.addEventListener(Event.COMPLETE, loadTranslations);
+					
+				PopUpManager.addPopUp(w, this, true);
+			}
+
+
+
+			protected function translationGrid_itemEditEndHandler(event:DataGridEvent):void
+			{
+				
+				
+				var grid:DataGrid = event.target as DataGrid;
+				var field:String = event.dataField;
+				var row:Number = Number(event.rowIndex);
+				var col:int = event.columnIndex;
+				
+				if (grid != null)
+				{
+					var oldValue:String = grid.dataProvider.getItemAt(row)[field];
+					var newValue:String = grid.itemEditorInstance[grid.columns[col].editorDataField];
+					
+					// check if the value has changed
+					if (newValue != oldValue)
+					{
+						message.message = "saving...";
+						var newKeyword:Object = grid.dataProvider.getItemAt(row);
+							newKeyword.translationValue = newValue;
+						saveTranslation(newKeyword);
+						
+						if(oldValue == ""){
+							//one more translated
+							updateProgressBar(progressBar.value+1, progressBar.maximum);
+						}
+						if(newValue == ""){						
+							//one less translated
+							updateProgressBar(progressBar.value-1, progressBar.maximum);
+						}						
+						
+					} else {
+						message.message = "";
+					}
+				}			
+			}
+
+
+			protected function deleteKeywordResult_resultHandler(event:ResultEvent):void
+			{
+				message.message = event.result.adminResult.message;
+				translationsList.removeItemAt(translationGrid.selectedIndex);
+			}
+			
+			protected function getProjectResult_resultHandler(event:ResultEvent):void
+			{
+
+				var project:Project = Project(event.result.project);
+				if((project.languages != null)&&(project.languages.length > 1)){
+					sourceLanguages = String(project.languages).split(",");
+					languages = String(project.languages).split(",");
+
+				}
+				
+			}	
+			
+			private function clearSearch():void
+			{
+				translationsList.filterFunction = null;
+				translationsList.refresh();
+				search.text = '';
+			}
+			
+			private function matchChanged():void 
+			{ 
+				translationsList.filterFunction = filterTranslations;
+				translationsList.refresh();
+			}
+			
+			private function filterTranslations(item:Object):Boolean
+			{				   
+				
+				if( ( item.bundle.toLowerCase().search( search.text.toLowerCase()) != -1 )||
+					( item.keyValue.toLowerCase().search( search.text.toLowerCase()) != -1 ) ||
+					( item.sourceTranslation.toLowerCase().search( search.text.toLowerCase()) != -1 ) ||
+					( item.translationValue.toLowerCase().search( search.text.toLowerCase()) != -1 ))
+				{
+					return true;
+				}              
+				
+				
+				return false;              
+			}			
+
+			protected function btnExport_clickHandler(event:MouseEvent):void
+			{
+				var w:ExportWindow = new ExportWindow();	
+					w.project = _project;
+				PopUpManager.addPopUp(w, this, true);
+			}
+
+			protected function projectSelectBox_changeHandler(event:IndexChangeEvent):void
+			{
+				if (event.newIndex != event.oldIndex) 
+				{
+					project = Project(projectSelectBox.selectedItem);
+					loadTranslations();
+				}
+
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		
+		<translationservice:TranslationService id="translationService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="false"/>
+		<translationservice:TranslationService id="translationService2" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<s:CallResponder id="setTranslationResult" result="{message.message = 'saved'}"/>
+		<s:CallResponder id="deleteKeywordResult" result="deleteKeywordResult_resultHandler(event)" />
+
+		<projectservice:ProjectService id="projectService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<s:CallResponder id="listProjectsResult" result="listProjectsResult_resultHandler(event)"/>
+
+	</fx:Declarations>	
+	<s:HGroup verticalAlign="middle" width="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
+		
+		<s:Label text="Project:" fontWeight="bold" />
+		<s:ComboBox id="projectSelectBox" dataProvider="{projectsList}" labelField="name" change="projectSelectBox_changeHandler(event)" />
+		
+		<s:Label text=" Translate to:" fontWeight="bold" />
+		<components:LanguageSelectBox languages="{languages}" language="{language}"	change="languageSelectBox_changeHandler(event)"/>
+		
+		<s:Label text=" Progress:" fontWeight="bold" />
+		<mx:ProgressBar  label="" 
+						 enabled="true" 
+						 id="progressBar" 
+						 labelPlacement="center"
+						 fontSize="12"
+						 trackHeight="20" mode="{ProgressBarMode.MANUAL }" 
+ 						 color="#4A4A4A" fontWeight="bold" fontStyle="normal" indeterminate="false"/>
+		
+		<mx:Spacer width="40%" />
+		<mx:Label text="Search:"  fontWeight="bold" fontSize="12"/> 
+		<mx:TextInput id="search" change="{matchChanged()}" width="160" toolTip="Type in the search text" />
+		<mx:Button id="btnReset" label="Reset" click="{clearSearch()}"  height="23" right="0"/>		
+		<mx:Spacer width="20" />
+		<mx:Button  icon="@Embed(source='assets/reload.png')" label="reload" click="{loadTranslations()}" height="23" width="23"/>
+	</s:HGroup>
+
+
+	<components:MessageBox  id="message" />
+	
+	<mx:DataGrid id="translationGrid"
+				 dataProvider="{translationsList}"
+				 itemEditEnd="translationGrid_itemEditEndHandler(event)"
+				 height="100%" width="100%" 
+				 editable="true" variableRowHeight="true">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Bundle" dataField="bundle" editable="false" minWidth="60" includeIn="authenticatedAdmin">	
+				<mx:itemRenderer>
+					<fx:Component>						
+						<mx:HBox width="100%" verticalAlign="middle" paddingLeft="2" paddingRight="2" horizontalScrollPolicy="off" horizontalGap="0">
+							<s:Label text="{data.bundle}" width="100%" fontSize="9"/>
+	<!--						<mx:LinkButton icon="@Embed('assets/delete_inactive.png')" 
+										   overIcon="@Embed('assets/delete.png')"
+										   toolTip="delete bundle"
+										   width="12" right="0" click="{outerDocument.askDeleteBundle(data)}"/>
+							
+-->							
+						</mx:HBox>  						
+					</fx:Component>	
+				</mx:itemRenderer>
+				
+			</mx:DataGridColumn>
+
+			<mx:DataGridColumn editable="false" dataField="keyValue"  textAlign="center" headerText="Key" includeIn="authenticatedAdmin" minWidth="155">
+				<mx:itemRenderer>
+					<fx:Component>						
+						<mx:HBox width="100%" verticalAlign="middle" paddingLeft="2" paddingRight="2" horizontalScrollPolicy="off" horizontalGap="0">
+							<s:Label text="{data.keyValue}" width="100%" textAlign="left" fontSize="10"/>
+							<mx:LinkButton icon="@Embed('assets/delete_inactive.png')" 
+										   overIcon="@Embed('assets/delete.png')"
+										   toolTip="delete key"
+										   width="12" right="0" click="{outerDocument.askDeleteKeyword(data)}" /> 
+						</mx:HBox>  						
+					</fx:Component>
+				</mx:itemRenderer>
+			</mx:DataGridColumn>	
+			
+			<mx:DataGridColumn editable="false"  dataField="keyValue" textAlign="left" minWidth="140"
+							   headerText="Key" includeIn="authenticatedUser"  fontSize="9"
+							   paddingLeft="0" />			
+				
+			<mx:DataGridColumn dataField="sourceTranslation"   minWidth="250" editable="false" sortable="false" wordWrap="true">
+
+				<mx:headerRenderer>
+					<fx:Component>
+						<mx:HBox width="100%" verticalAlign="middle">
+
+							<s:Label text=" Source Translation" fontSize="14"/>
+				
+							<components:LanguageSelectBox height="22" width="100%"
+														  language="{outerDocument.sourceLanguage}"
+														  languages="{outerDocument.sourceLanguages}"
+														  change="outerDocument.sourceLanguageSelectBox_changeHandler(event)"/>							
+						</mx:HBox> 
+					</fx:Component>
+				</mx:headerRenderer>			
+				<mx:itemRenderer>
+					<fx:Component>						
+						<mx:HBox width="100%" verticalAlign="middle" paddingLeft="2" paddingRight="2" horizontalScrollPolicy="off" horizontalGap="0">
+							<s:Label text="{data.sourceTranslation}" width="100%" textAlign="left" fontSize="10"/>
+							<mx:LinkButton icon="@Embed('assets/search_inactive.png')" 
+										   overIcon="@Embed('assets/search.png')"
+										   toolTip="get help from Google Translate"
+										   width="12" right="0" click="{outerDocument.searchGoogleTranslation(data)}" />  							
+						</mx:HBox>  						
+					</fx:Component>
+				</mx:itemRenderer>				
+			</mx:DataGridColumn>
+			
+			<mx:DataGridColumn dataField="translationValue" headerText="Translation" fontWeight="bold"  editable="true" minWidth="350"
+							   sortable="false" wordWrap="true" itemEditor="mx.controls.TextArea"
+							   itemRenderer="com.amadeus.ori.translate.ui.components.DataGridItemRenderer">
+				<mx:headerRenderer>
+					<fx:Component>
+						<mx:VBox width="100%" verticalAlign="middle">
+							
+							<s:Label text="  Translation {outerDocument.languageTitle}" fontSize="14" />
+							<!--
+							<components:LanguageSelectBox height="22" width="100%"
+														  languages="{outerDocument.languages}"
+														  language="{outerDocument.language}"														  
+														  change="outerDocument.languageSelectBox_changeHandler(event)"/>
+							-->
+							
+						</mx:VBox> 
+					</fx:Component>
+				</mx:headerRenderer>	
+
+			</mx:DataGridColumn>				
+					
+		</mx:columns>		
+	</mx:DataGrid>
+	<mx:HBox  width="100%"  backgroundColor="#F9F9F9" includeIn="authenticatedAdmin" paddingTop="2">
+		<mx:Button label="Add key" click="btnAddKey_clickHandler(event)"  id="btnAddKey" height="23" width="160" icon="@Embed(source='assets/add.png')"/>
+		<mx:Spacer width="100%" />
+		<mx:Button label="Export package" click="btnExport_clickHandler(event)"  id="btnExport" height="23" width="160" icon="@Embed(source='assets/save.png')"/>		
+	</mx:HBox>
+</s:VGroup>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"  xmlns:components="com.amadeus.ori.translate.ui.components.*"
+		gap="2">
+	
+	
+	<fx:Metadata>
+		[ResourceBundle("countries")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayList;
+			import mx.utils.StringUtil;
+			
+			[Bindable]
+			public var countries:ArrayList = new ArrayList();
+			
+
+			public function set countriesAsCSV(csvString:String):void{
+
+				if((csvString == null)||(csvString.length ==0)){
+					
+				} else {
+					
+					countries  = new ArrayList(csvString.split(","));
+				}
+			}
+			
+			
+			public function get countriesAsCSV():String{
+
+				return countries.toString();
+			}
+			
+			
+			private function getCountryName(item:Object):String {
+				return StringUtil.substitute("{0} ({1})", resourceManager.getString("countries", item.toString()) , item.toString());
+			}
+			
+
+			protected function btnAddCountry_clickHandler(event:MouseEvent):void
+			{
+				var country:String = countrySelectBox.country;
+				
+				if(country != null){
+					
+					//make sure we do not get duplicates
+
+					var i:int;
+					for (i = 0; i < countries.length; i++)
+					{
+						if(countries.getItemAt(i) == country) return;
+					}
+
+					countries.addItem(country);
+				}
+			}
+
+
+			protected function btnDeleteCountry_clickHandler(event:MouseEvent):void
+			{
+				if(countryList.selectedItem != null){
+					countries.removeItemAt(countryList.selectedIndex);
+				}
+			}
+
+		]]>
+	</fx:Script>
+
+	<s:List id="countryList" dataProvider="{countries}" labelFunction="getCountryName" width="200" height="80">
+		
+	</s:List>
+	<s:HGroup gap="0">
+		<components:CountrySelectBox id="countrySelectBox" width="150" height="22"/>
+		<mx:Button icon="@Embed('assets/add.png')" label="" id="btnAddCountry" click="btnAddCountry_clickHandler(event)"  width="20" height="22"/>
+		<mx:Spacer width="10" />
+		<mx:Button icon="@Embed('assets/delete.png')" label="" id="btnDeleteCountry" click="btnDeleteCountry_clickHandler(event)"  width="20" enabled="{countryList.selectedIndex > -1}" height="22"/>
+	</s:HGroup>
+	
+	
+</s:VGroup>

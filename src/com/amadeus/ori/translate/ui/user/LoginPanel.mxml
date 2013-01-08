@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup width="100%" height="100%" 
+		  xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"  
+		  xmlns:securityservice="services.securityservice.*" xmlns:components="com.amadeus.ori.translate.ui.components.*">
+
+	<s:states>		
+		<s:State id="authenticate" name="authenticate" />
+		<s:State id="loading" name="loading" />
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.SHA256;
+			import mx.validators.Validator;
+			
+			import valueObjects.IdentityResult;
+	
+			
+			protected function login(event:Event):void
+			{
+				
+				if(Validator.validateAll(validators).length == 0){
+
+					currentState="loading";
+					
+					var pwd:String = null;
+					
+					//encode the password as SHA256
+					var bytes:ByteArray = new ByteArray();
+					bytes.writeMultiByte(password.text, "iso-8859-1");
+					pwd = SHA256.computeDigest(bytes);	
+					
+					authenticateResult.token = securityService.authenticate(FlexGlobals.topLevelApplication.engineBaseUrl, username.text, pwd);
+					password.text = "";
+					
+				} else {
+					message.checkFormFields();
+				}
+				
+			}
+			
+			
+			protected function authenticateResult_resultHandler(event:ResultEvent):void
+			{
+				var identityResult:IdentityResult = event.result as IdentityResult;
+				if((identityResult != null)&&(identityResult.identity != null)){
+					message.reset();					
+					dispatchEvent(new AuthenticationEvent(AuthenticationEvent.AUTHENTICATED,identityResult.identity));
+				}else{
+					message.errorMessage = "Error during authentication, please try again.";
+					currentState="authenticate";
+				}
+				
+			}
+			
+			
+			
+			
+			protected function btnLoginGoogle_clickHandler(event:MouseEvent):void
+			{
+				//this will go to google SSO
+				var request:URLRequest = new URLRequest("/process/security/loginGoogle");
+				navigateToURL(request, "_self");
+				currentState="loading";
+			}
+			
+
+			protected function authenticateResult_faultHandler(event:FaultEvent):void
+			{
+				trace("fault");
+				currentState="authenticate";
+			}
+
+		]]>
+	</fx:Script>
+	 
+	<fx:Declarations>
+		<s:CallResponder id="authenticateResult" result="authenticateResult_resultHandler(event)" fault="authenticateResult_faultHandler(event)" />
+		<securityservice:SecurityService id="securityService"  showBusyCursor="true" fault="{message.errorMessage = event.fault.content.toString()}"/>
+		
+		<fx:Array id="validators">		
+			<mx:StringValidator  source="{username}" property="text" required="true" minLength="4" trigger="{btnLogin}"/>		
+			<mx:StringValidator  source="{password}" property="text" required="true" minLength="4" trigger="{btnLogin}"/>
+			<mx:EmailValidator  source="{username}" property="text" required="true" trigger="{btnLogin}"/>	
+		</fx:Array>		
+	</fx:Declarations>
+	
+	<s:Spacer height="25%"/>	
+	
+	
+	
+	<s:Group width="100%" >
+		<s:Rect  id="rect2" right="0" left="0" top="0" bottom="0">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry alpha="1.0" color="#efefef" ratio="0"/>
+					<s:GradientEntry alpha="1.0" color="#eeeeee" ratio="0.2"/>
+					<s:GradientEntry alpha="1.0" color="#cccccc" ratio="0.79019607843137253"/>
+					
+					<s:GradientEntry alpha="1.0" color="#999999" ratio="1"/>
+				</s:LinearGradient>	
+			</s:fill>
+		</s:Rect>	
+		<s:HGroup width="100%" includeIn="authenticate" >
+			<s:Spacer width="19%"/>
+			<s:Form id="loginform1" width="30%">		    		
+				<s:FormHeading label="Google Sign-in"/>
+				<s:Spacer height="25"/>
+				<s:HGroup>
+					<s:Spacer width="30" />
+					<s:Button x="79" y="3" label="Sign in with Google" id="btnLoginGoogle"
+							   icon="@Embed(source='/assets/gaccounts_small.png')"
+							   click="btnLoginGoogle_clickHandler(event)"  width="171" height="38" />
+				</s:HGroup>						
+								
+			</s:Form>	
+			
+			<mx:VRule  height="100%"/>
+
+			<s:Form id="loginform" width="30%">		    		
+				<s:FormHeading label="Login with Password"/>
+						
+				<s:FormItem label="Username">
+					<s:TextInput id="username" width="100%"  />
+				</s:FormItem> 
+				<s:FormItem label="Password">
+					<s:TextInput id="password" width="100%" displayAsPassword="true" enter="login(event)" />
+				</s:FormItem>	
+				
+				<s:FormItem>
+					<s:Button label="Login" id="btnLogin" click="login(event)"/>
+				<!--	<s:Button label="lost password" id="btnLostPassword" click="{Alert.show('Not implemented.')}"/> -->
+					<components:FormMessage id="message"/>
+				</s:FormItem>
+			</s:Form>				
+		</s:HGroup>
+		<s:HGroup width="100%" includeIn="loading"  height="150" verticalAlign="middle">
+			<s:Spacer width="36%"/>
+			<mx:ProgressBar indeterminate="true" label="validating credentials" />
+		</s:HGroup>
+	</s:Group>
+	
+</s:VGroup> 	

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"  
+			   xmlns:translate="com.amadeus.ori.translate.*" 
+			   xmlns:ui="com.amadeus.ori.translate.ui.*" 
+			   xmlns:user="com.amadeus.ori.translate.ui.user.*" 
+			   xmlns:securityservice="services.securityservice.*"
+			   creationComplete="creationCompleteHandler(event)" 
+			   xmlns:logging="com.amadeus.ori.translate.ui.logging.*" 
+			   width="100%" 
+			   height="100%"
+			   preloader="com.amadeus.ori.translate.ui.preloader.Preloader" 
+			   xmlns:ns="library://ns.adobe.com/flex/halo" xmlns:project="com.amadeus.ori.translate.ui.project.*">
+	<s:states>
+		<s:State id="authenticate" name="authenticate" />
+		<s:State id="authenticatedUser"  name="authenticatedUser"/>		
+		<s:State id="authenticatedAdmin"  name="authenticatedAdmin"/>		
+	</s:states>
+	
+	<fx:Style source="assets/styles.css"/>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.amadeus.ori.translate.ui.user.AuthenticationEvent;
+			
+			import mx.events.FlexEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.URLUtil;
+			
+			import valueObjects.Identity;
+			import valueObjects.IdentityResult;
+			
+			[Bindable]
+			private var identity:Identity = null;
+			
+			[Bindable]
+			public var engineBaseUrl:String;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				var browserUrl:String = url;
+				var port:uint =  URLUtil.getPort(browserUrl);
+				engineBaseUrl =(port > 0) ? URLUtil.getServerName(browserUrl) + ":" + URLUtil.getPort(browserUrl) : URLUtil.getServerName(browserUrl) ;
+//				engineBaseUrl = "localhost:8888";
+				loginPanel.addEventListener(AuthenticationEvent.AUTHENTICATED, login);
+				getIdentityResult.token = securityService.getIdentity(engineBaseUrl);
+				
+				gaePinger.start();
+			}
+			
+			private function login(event:AuthenticationEvent):void{
+				
+				changeIdentity(event.identity);
+						
+			}
+			
+			private function changeIdentity(ident:Identity):void{
+				
+				//update states when identity changes
+				if(ident!=identity){		
+					
+					identity = ident;
+					
+					if(ident == null){
+						currentState = "authenticate";
+						
+					} else if(ident.role == 'ROLE_ADMIN'){
+						
+						currentState = "authenticatedAdmin";
+						appViewAdmin.selectedIndex = 0;						
+						buttonBar.dataProvider = appViewAdmin; 
+
+						
+					} else {
+						currentState = "authenticatedUser"; 
+						appViewUser.selectedIndex = 0;						
+						buttonBar.dataProvider = appViewUser; 
+						appViewUser.selectedIndex = 0;
+					}
+				}
+				
+				if(ident == null){					
+					loginPanel.currentState = "authenticate";
+					identity = null;
+				}
+				
+			}
+
+			protected function getIdentityResult_resultHandler(event:ResultEvent):void
+			{
+				var idres:IdentityResult = event.result as IdentityResult;
+				changeIdentity(idres.identity);
+			}
+			
+			
+			protected function btnLogout_clickHandler(event:MouseEvent):void
+			{
+				logoutResult.token = securityService.logout(engineBaseUrl);
+				changeIdentity(null);
+				
+			}
+
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>			
+		<s:CallResponder id="getIdentityResult" result="getIdentityResult_resultHandler(event)"/>
+		<securityservice:SecurityService id="securityService" showBusyCursor="true"/>
+		<s:CallResponder id="logoutResult" />
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	<s:controlBarContent>		
+		<s:HGroup width="100%" >
+			<s:Label fontSize="22" width="100%" fontWeight="bold" text="TranslateIT!" color="#1478d6"/>
+			<s:ButtonBar id="buttonBar" includeIn="authenticatedUser,authenticatedAdmin" selectedIndex="0"/>
+
+			<mx:Spacer width="60%" />
+		</s:HGroup>
+		<s:VGroup gap="1" visible="{identity != null}" >
+			<s:HGroup   color="#8D8D8D" >
+				<s:Label text="{identity.username}" height="22" verticalAlign="middle" fontWeight="bold" />
+				<mx:LinkButton label="logout" id="btnLogout"  height="20"  horizontalGap="0" textAlign="left" click="btnLogout_clickHandler(event)"/>
+			</s:HGroup>
+			<ui:GAEPinger id="gaePinger" />
+		</s:VGroup>
+	</s:controlBarContent>	
+	
+	<user:LoginPanel   includeIn="authenticate"  id="loginPanel"/>
+
+	<mx:ViewStack id="appViewUser" width="100%" height="100%" includeIn="authenticatedUser" paddingLeft="5" paddingRight="5" paddingBottom="5">
+		
+		<s:NavigatorContent label="translate" width="100%" height="100%" >
+			<ui:TranslatePanel identity="{identity}"  currentState="{currentState}" />
+		</s:NavigatorContent>
+		
+		<s:NavigatorContent label="profile" width="100%" height="100%">
+			<user:PersonalProfilePanel identity="{identity}" />
+		</s:NavigatorContent>		
+	</mx:ViewStack>
+	
+	<mx:ViewStack id="appViewAdmin" width="100%" height="100%" includeIn="authenticatedAdmin" paddingLeft="5" paddingRight="5" paddingBottom="5">
+		
+		<s:NavigatorContent label="translate" width="100%" height="100%" >
+			<ui:TranslatePanel identity="{identity}" currentState="{currentState}" />
+		</s:NavigatorContent>
+		
+		<s:NavigatorContent label="import" width="100%" height="100%" >
+			<ui:ImportPanel id="importPanel" />
+		</s:NavigatorContent>		
+	
+		<s:NavigatorContent label="projects" width="100%" height="100%" >
+			<project:ProjectsPanel />
+		</s:NavigatorContent>
+
+		<s:NavigatorContent label="users" width="100%" height="100%" >
+			<user:UsersPanel />
+		</s:NavigatorContent>
+		
+		<s:NavigatorContent label="logs" width="100%" height="100%" >
+			<logging:LogEntryPanel />
+		</s:NavigatorContent>
+		
+		<s:NavigatorContent label="profile" width="100%" height="100%">
+			<user:PersonalProfilePanel identity="{identity}" />
+		</s:NavigatorContent>		
+	</mx:ViewStack>
+
+
+		
+</s:Application>

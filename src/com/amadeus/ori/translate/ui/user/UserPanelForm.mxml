@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" 
+		  height="100%" 
+		  width="100%" 
+		  xmlns:userservice="services.userservice.*" 
+		  xmlns:valueObjects="valueObjects.*" 
+		  xmlns:user="com.amadeus.ori.translate.ui.user.*"
+		  xmlns:components="com.amadeus.ori.translate.ui.components.*">
+	
+	<fx:Metadata>
+		/**
+		*  Dispatched when the user data has been updated
+		*
+		*  @eventType com.amadeus.ori.translate.ui.user.UserEvent.USER_UPDATED
+		*/
+		[Event(name="userUpdated", type="com.amadeus.ori.translate.ui.user.UserEvent")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[ 
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.SHA256;
+			import mx.validators.Validator;
+			
+			import valueObjects.UserResult;
+			
+			
+			
+			protected function btnSave_clickHandler(event:MouseEvent):void
+			{
+				
+				if(Validator.validateAll(validators).length == 0){ 				
+					
+					var languages:String = selectLanguages.languagesAsCSV;
+					trace(languages);
+					var password:String = password1.text;
+					
+					if(password != ""){
+						var bytes:ByteArray = new ByteArray();
+						bytes.writeMultiByte(password, "iso-8859-1");
+						password = SHA256.computeDigest(bytes);					
+					}
+					
+					saveUserResult.token = userService.updateUser(
+						FlexGlobals.topLevelApplication.engineBaseUrl,
+						inputUsername.text,
+						password,
+						inputFirstName.text,
+						inputLastName.text,
+						inputEmail.text,
+						languages,
+						radioEnabled.selected.toString(),
+						radioAdmin.selected.toString());
+					
+					password1.text = "";
+					password2.text = "";
+					
+				} else {
+					message.checkFormFields();
+				} 					
+			}
+			
+			protected function saveUserResult_resultHandler(event:ResultEvent):void
+			{
+				var userResult:UserResult = event.result as UserResult;
+				
+				if(userResult.user != null){
+					message.message = "Changes have been saved."; 					
+					dispatchEvent(new UserEvent(UserEvent.USER_UPDATED, userResult.user));
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		
+		<userservice:UserService id="userService" fault="Alert.show(event.fault.content.toString())" showBusyCursor="true"/>
+		<s:CallResponder id="saveUserResult" result="saveUserResult_resultHandler(event)" fault="{message.errorMessage = event.fault.content.toString()}"/>
+		
+		<fx:Object id="user" />
+		
+		<fx:Array id="validators">			
+			<mx:StringValidator  source="{password1}" property="text" required="{password1.text.length > 0}" minLength="4" trigger="{btnSaveUser}"/>
+			<user:PasswordValidator id="pwvPasswords" required="{password1.text.length > 0}" source="{password1}" property="text" confirmationSource="{password2}" confirmationProperty="text" trigger="{btnSaveUser}" />
+			<mx:EmailValidator  source="{inputEmail}" property="text" required="true" trigger="{btnSaveUser}"/>	
+		</fx:Array>	
+	</fx:Declarations>	
+	
+	<s:HGroup gap="0">
+		
+		<s:Form>
+			<s:FormItem label="Username">
+				<s:TextInput text="{user.username}" id="inputUsername" width="200" enabled="false" fontWeight="bold"/>
+			</s:FormItem>
+			<s:FormItem label="E-Mail">
+				<s:TextInput text="{user.email}" id="inputEmail" width="200"/>
+			</s:FormItem>
+			<s:FormItem visible="{user.googleAccount}" includeInLayout="{user.googleAccount}">
+				
+				<s:Label text="Google Account" fontWeight="bold"/>
+				<s:Image source="@Embed(source='/assets/gaccounts_small.png')" />
+				
+			</s:FormItem>					
+			<s:FormItem visible="{!user.googleAccount}" includeInLayout="{!user.googleAccount}" label="Password">
+				<s:TextInput text="" id="password1" width="200" displayAsPassword="true" prompt="new password"/>
+			</s:FormItem>	
+			<s:FormItem visible="{!user.googleAccount}" includeInLayout="{!user.googleAccount}" label="Password">
+				<s:TextInput text="" id="password2" width="200" displayAsPassword="true" prompt="repeat new password"/>
+			</s:FormItem>	
+	
+			
+
+			
+		</s:Form>
+		
+		<s:Form>
+			<s:FormItem label="First Name">
+				<s:TextInput text="{user.firstName}" id="inputFirstName" width="200"/>
+			</s:FormItem>
+			<s:FormItem label="Last Name">
+				<s:TextInput text="{user.lastName}" id="inputLastName" width="200"/>
+			</s:FormItem>					
+
+			<s:FormItem label="Enabled">
+				<s:HGroup>
+					<s:RadioButton id="radioEnabled" label="yes" groupName="enabled" selected="{user.enabled}" />
+					<s:RadioButton label="no"  groupName="enabled" selected="{!user.enabled}" />						
+				</s:HGroup>					
+			</s:FormItem>	
+			<s:FormItem label="Admin">
+				<s:HGroup>
+					<s:RadioButton id="radioAdmin" label="yes" groupName="admin" selected="{user.role == 'ROLE_ADMIN'}" />
+					<s:RadioButton label="no"  groupName="admin" selected="{user.role != 'ROLE_ADMIN'}" />														
+				</s:HGroup>	
+			</s:FormItem>	
+		</s:Form>		
+		
+		<s:Form height="100%">
+			<s:FormItem label="Language(s)" height="100%">
+				<components:LanguageSelectList id="selectLanguages"  languagesAsCSV="{user.languages}" height="100%" />
+			</s:FormItem>
+		</s:Form>
+		
+	</s:HGroup>
+	
+	<s:HGroup>		
+		<s:Spacer width="10" />
+		<s:Button id="btnSaveUser" label="save" fontWeight="bold" click="btnSave_clickHandler(event)"/>
+		<components:FormMessage  id="message" />
+	</s:HGroup>	
+</s:VGroup>

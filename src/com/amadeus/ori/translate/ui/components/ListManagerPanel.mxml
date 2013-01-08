@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel layout="vertical"
+		  title="List Manager"
+		  width="300" height="350"
+		  creationComplete="onCreationComplete()"
+		  currentState="Loading"
+		  status="{currentState}"
+		  xmlns:mx="http://www.adobe.com/2006/mxml">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;
+			import mx.managers.DragManager;
+			import mx.events.DragEvent;
+			import mx.events.CloseEvent;
+			import mx.controls.Alert;
+			import mx.events.CollectionEvent;
+			import com.truespire.events.ItemEvent;
+			import mx.collections.ArrayCollection;
+			import com.truespire.models.Item;
+			
+			[Bindable]
+			public var selectedItem:Item;
+			
+			private var _itemForm:ItemForm = new ItemForm();
+			
+			[Bindable]
+			public var listItems:ArrayCollection = new ArrayCollection();
+			
+			private function validateState(event:CollectionEvent = null):void {
+				if (listItems.length > 0) {
+					currentState = "List All";
+					if (itemsList.selectedItem != null && itemsList.selectedItems.length == 1) {
+						selectedItem = itemsList.selectedItem as Item;
+					} else {
+						selectedItem = null;
+					}
+				} else {
+					currentState = "Empty List";
+					selectedItem = null;
+				}
+			}
+			
+			// Add necessary event listeners when creation is complete.
+			private function onCreationComplete():void {
+				listItems.addEventListener(CollectionEvent.COLLECTION_CHANGE, validateState);
+				
+				addEventListener(DragEvent.DRAG_ENTER, onDragEnter);
+				addEventListener(DragEvent.DRAG_DROP, onDragDrop);
+				
+				_itemForm.addEventListener(ItemEvent.CREATE_ITEM_SUCCESS, onItemCreationSuccess);
+				_itemForm.addEventListener(ItemEvent.CREATE_ITEM_VALIDATION_ERROR, onItemValidationError);
+				_itemForm.addEventListener(ItemEvent.UPDATE_ITEM_SUCCESS, onItemUpdateSuccess);
+				_itemForm.addEventListener(ItemEvent.UPDATE_ITEM_VALIDATION_ERROR, onItemValidationError);
+				validateState();
+			}
+			
+			// -----------------------------------
+			// List Item Action Methods
+			// -----------------------------------
+			private function editItem():void {
+				_itemForm.item = selectedItem;
+				_itemForm.formForNew = false;
+				currentState = "Edit";
+				_itemForm.itemForm.defaultButton = saveButton;
+			}
+			
+			private function newItem():void {
+				_itemForm.formForNew = true;
+				currentState = "New";
+				_itemForm.itemForm.defaultButton = saveButton;
+			}
+			
+			private function cancelForm():void {
+				_itemForm.resetForm();
+				if (itemsList) {
+					itemsList.selectedItem = null;
+				}
+				validateState();
+			}
+			
+			private function deleteConfirmation():void {
+				Alert.yesLabel = "Delete";
+				Alert.show("Item deletion cannot be undone.", "Are You Sure?",
+					Alert.YES | Alert.CANCEL, this.parentApplication as Sprite, deleteItem, null, Alert.YES);
+			}
+			
+			// Removes all items currently selected in the items list.
+			private function deleteItem(eventObj:CloseEvent):void {
+				if (eventObj.detail == Alert.YES) {
+					
+					for each (var item:Item in itemsList.selectedItems) {
+						listItems.removeItemAt(listItems.getItemIndex(item));
+					}
+					selectedItem = null; // reset selected item.
+				}
+			}
+			
+			// -----------------------------------
+			// Creation & Update Event Listeners
+			// -----------------------------------
+			private function onItemCreationSuccess(event:ItemEvent):void {
+				listItems.addItem(event.item);
+				currentState = "List All";
+			}
+			
+			private function onItemUpdateSuccess(event:ItemEvent):void {
+				var index:int = listItems.getItemIndex(selectedItem);
+				listItems.removeItemAt(index);
+				listItems.addItemAt(event.item, index);
+				currentState = "List All";
+			}
+			
+			private function onItemValidationError(event:ItemEvent):void {
+				_itemForm.addNoticePanel(event.errorTitle, event.errorMessage, NoticePanel.ERROR_NOTICE);
+			}
+			
+			// -----------------------------------
+			// Drag Event Listeners
+			// -----------------------------------
+			private function onDragEnter(event:DragEvent):void {
+				if (currentState == "Empty List") {
+					DragManager.acceptDragDrop(event.target as UIComponent);
+				}
+			}
+			
+			private function onDragDrop(event:DragEvent):void {
+				for each (var item:Item in event.dragSource.dataForFormat("items")) {
+					listItems.addItem(item);
+				}
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:ControlBar id="listControlBar"/>
+	
+	<mx:states>
+		<mx:State name="items">
+			<mx:AddChild position="lastChild"
+						 relativeTo="{listControlBar}">
+				<mx:Button id="newButton"
+						   label="New"
+						   click="newItem()"
+						   styleName="new"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild"
+						 relativeTo="{listControlBar}">
+				<mx:Button id="deleteButton"
+						   label="Delete"
+						   click="deleteConfirmation()"
+						   enabled="{itemsList.selectedItems.length != 0}"
+						   styleName="delete"/>
+			</mx:AddChild>
+			<mx:AddChild position="before"
+						 relativeTo="{newButton}">
+				<mx:Button id="editButton"
+						   label="Edit"
+						   click="editItem()"
+						   enabled="{selectedItem != null}"
+						   styleName="edit"/>
+			</mx:AddChild>
+			<mx:AddChild position="before"
+						 relativeTo="{newButton}">
+				<mx:Spacer width="100%" height="1"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="Show">
+			<mx:AddChild position="lastChild"
+						 relativeTo="{listControlBar}">
+				<mx:Button id="backButton"
+						   label="Back To List"
+						   click="{currentState = &quot;List All&quot;}"
+						   styleName="prev">
+					<mx:icon>@Embed(source='/assets/icons/16x16/arrow_left.png')</mx:icon>
+				</mx:Button>
+			</mx:AddChild>
+			<mx:AddChild position="before"
+						 relativeTo="{listControlBar}">
+				<comps:ItemShow id="showItem"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="itemForm">
+			<mx:AddChild position="lastChild"
+						 relativeTo="{listControlBar}">
+				<mx:Button id="saveButton"
+						   label="Save"
+						   styleName="save"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild"
+						 relativeTo="{listControlBar}">
+				<mx:Button id="cancelButton"
+						   label="Cancel"
+						   click="cancelForm()"
+						   styleName="cancel"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild"
+						 target="{_itemForm}"/>
+		</mx:State>
+		<mx:State basedOn="itemForm"
+				  name="Edit">
+			<mx:SetProperty name="label"
+							target="{saveButton}"
+							value="Update"/>
+			<mx:SetEventHandler handler="_itemForm.submitForm()"
+								name="click"
+								target="{saveButton}"/>
+		</mx:State>
+		<mx:State basedOn="itemForm"
+				  name="New">
+			<mx:SetProperty name="label"
+							target="{saveButton}"
+							value="Create"/>
+			<mx:SetEventHandler handler="_itemForm.submitForm()"
+								name="click"
+								target="{saveButton}"/>
+		</mx:State>
+		<mx:State basedOn="items"
+				  name="List All">
+			<mx:AddChild position="before"
+						 relativeTo="{listControlBar}">
+				<mx:List id="itemsList"
+						 width="100%" height="100%"
+						 allowMultipleSelection="true"
+						 change="validateState()"
+						 dataProvider="{listItems}"
+						 doubleClick="editItem()"
+						 doubleClickEnabled="true"
+						 dragComplete="validateState()"
+						 dragEnabled="true"
+						 dragMoveEnabled="true"
+						 dropEnabled="true">
+				</mx:List>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State basedOn="items"
+				  name="Empty List">
+			<mx:SetStyle name="horizontalAlign"
+						 value="center"/>
+			<mx:SetStyle name="verticalAlign"
+						 value="middle"/>
+			<mx:AddChild>
+				<mx:Label id="noItemsTitle"
+						  styleName="smallTitle"
+						  text="{title} Is Empty"/>
+			</mx:AddChild>
+			<mx:AddChild>
+				<mx:Text id="noItemsInstructions"
+						 width="174"
+						 text="Add items via the 'New' button, drag &amp; drop, or arrow controls."
+						 textAlign="center"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="Loading">
+			<mx:SetStyle name="horizontalAlign"
+						 value="center"/>
+			<mx:SetStyle name="verticalAlign"
+						 value="middle"/>
+			<mx:AddChild position="lastChild">
+				<mx:Label id="loadingLabel"
+						  styleName="smallTitle"
+						  text="Loading List..."/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+	
+</mx:Panel>

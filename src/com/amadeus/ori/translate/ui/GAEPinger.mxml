@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+
+			private var loaderTimer:Timer;
+			private var urlRequest:URLRequest;
+			private var adengineLoader:URLLoader ;
+			
+			public function start():void {
+
+				if (loaderTimer == null) 
+				{
+					urlRequest = new URLRequest("http://" + FlexGlobals.topLevelApplication.engineBaseUrl + "/process/translate/initialize");
+					loaderTimer = new Timer(30000, 1);
+					loaderTimer.addEventListener(TimerEvent.TIMER_COMPLETE, timerEvent);
+					adengineLoader = new URLLoader();
+					adengineLoader.addEventListener(IOErrorEvent.IO_ERROR,foobar);
+					adengineLoader.addEventListener(Event.COMPLETE,adengineLoaded); 
+					timerEvent(null);
+				}
+			}
+			
+			private function foobar(evt:Event):void{
+				
+			}
+			
+			private function timerEvent(evt:Event):void{
+				timeLabel.text = "..";
+				adengineLoader.load(urlRequest);
+			}
+			
+			
+			public function adengineLoaded(event:Event):void
+			{
+
+				timeLabel.text = ".";
+				loaderTimer.reset();
+				loaderTimer.start();
+			}
+
+
+		]]>
+	</fx:Script>
+	<fx:Declarations> 
+	</fx:Declarations>
+	<s:Label id="timeLabel" text="..." color="gray"/>
+</s:Group>

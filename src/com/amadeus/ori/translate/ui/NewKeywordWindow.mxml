@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"  
+				title="Add a Keyword" 
+				creationComplete="initializeMe()"
+				height="334" xmlns:keyword="com.amadeus.ori.translate.ui.keyword.*" 
+				xmlns:keywordservice="services.keywordservice.*" 
+				xmlns:components="com.amadeus.ori.translate.ui.components.*" 
+				xmlns:translationservice="services.translationservice.*">
+
+	<fx:Metadata>
+		/**
+		 *  Dispatched when the new keyword has been created
+		 *
+		 *  @eventType com.amadeus.ori.translate.ui.keyword.KeywordEvent.NEW_USER_CREATED
+		 */
+		[Event(name="newKeywordCreated", type="com.amadeus.ori.translate.ui.keyword.KeywordEvent")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.validators.Validator;
+			
+			import valueObjects.Project;
+			
+			private var closeMe:Boolean = true;
+			
+			[Bindable]
+			public var project:Project;
+			
+			private function initializeMe():void
+			{
+				PopUpManager.centerPopUp(this);
+				this.addEventListener("close", close);
+				keyValue.setFocus()
+			}
+			
+			public function close(event:Event):void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			
+			private function save():void
+			{
+				addKeywordResult.token = translationService.addKeyword(FlexGlobals.topLevelApplication.engineBaseUrl, 
+					bundleList.selectedItem, 
+					keyValue.text, 
+					context.text, 
+					defaultTranslation.text, 
+					project.id);	
+			}
+			
+			private function addKeyword():void
+			{
+				if(Validator.validateAll(validators).length == 0){ 
+					closeMe = true;
+					save();
+
+				} else {
+					message.checkFormFields();
+				} 
+								
+			}			
+			
+			private function saveAndAddKeyword():void
+			{
+				
+				if(Validator.validateAll(validators).length == 0){ 
+					closeMe = false;
+					save();	
+				} else {
+					message.checkFormFields();
+				} 
+				
+			}				
+
+			protected function createKeywordResult_resultHandler(event:ResultEvent):void
+			{
+				if(closeMe){	
+					dispatchEvent(new Event(Event.COMPLETE));
+					close(null);
+				} else {
+					//reset form but keep selected bundle
+					keyValue.text = defaultTranslation.text = context.text = "";
+				}
+			}
+
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<fx:Array id="validators">				
+			<mx:StringValidator  source="{keyValue}" property="text" minLength="3" trigger="{btnAddKeyword}"/>						
+			<mx:StringValidator  source="{defaultTranslation}" property="text" minLength="3" trigger="{btnAddKeyword}"/>
+			<s:NumberValidator  source="{bundleList}" property="selectedIndex" minValue="0" lessThanMinError="Please select a bundle." />
+		</fx:Array>	
+
+		<translationservice:TranslationService id="translationService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<s:CallResponder id="addKeywordResult" 
+						 result="createKeywordResult_resultHandler(event)"
+						 fault="{message.errorMessage = event.fault.content.toString()}"/>	
+	</fx:Declarations>	
+
+	
+	<s:Form id="form">
+		
+		<s:FormItem label="Bundle" fontWeight="bold">
+					<s:ComboBox 	id="bundleList" 							
+									dataProvider="{project.bundleList}" 
+									labelField="name"/>				
+		</s:FormItem>
+	
+		<s:FormItem label="Key">
+			<s:TextInput id="keyValue" width="100%" />
+		</s:FormItem>
+		<s:FormItem label="Default translation">
+			<s:TextInput id="defaultTranslation" width="100%" />
+		</s:FormItem>
+		<s:FormItem label="Context information">
+			<s:TextArea id="context" width="100%"  height="62"/>
+		</s:FormItem>		
+		
+		<s:FormItem>
+			<s:HGroup>
+				<s:Button label="add" click="{addKeyword()}" id="btnAddKeyword"/>
+				<s:Button label="save and add another" click="{saveAndAddKeyword()}" id="btnSaveAndAdd"/>
+				<components:FormMessage  id="message" />
+			</s:HGroup>
+		</s:FormItem>
+	</s:Form> 
+</s:TitleWindow>
