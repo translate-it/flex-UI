@@ -111,7 +111,7 @@
 	<s:Form id="form">
 		
 		<s:FormItem label="Bundle" fontWeight="bold">
-					<s:ComboBox 	id="bundleList" 							
+					<s:DropDownList 	id="bundleList" 							
 									dataProvider="{project.bundleList}" 
 									labelField="name"/>				
 		</s:FormItem>

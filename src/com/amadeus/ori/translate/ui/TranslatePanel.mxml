@@ -445,7 +445,7 @@
 	<s:HGroup verticalAlign="middle" width="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
 		
 		<s:Label text="Project:" fontWeight="bold" />
-		<s:ComboBox id="projectSelectBox" dataProvider="{projectsList}" labelField="name" change="projectSelectBox_changeHandler(event)" />
+		<s:DropDownList id="projectSelectBox" dataProvider="{projectsList}" labelField="name" change="projectSelectBox_changeHandler(event)" />
 		
 		<s:Label text=" Translate to:" fontWeight="bold" />
 		<components:LanguageSelectBox languages="{languages}" language="{language}"	change="languageSelectBox_changeHandler(event)"/>

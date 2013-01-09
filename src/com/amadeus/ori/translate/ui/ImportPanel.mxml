@@ -26,7 +26,13 @@
 			private var _project:Project;
 			
 			[Bindable]
-			private var projectsList:ArrayCollection;	
+			private var projectsList:ArrayCollection;
+			
+			[Bindable]
+			private var formatsList:ArrayCollection;
+
+			[Bindable]
+			private var formatId:String;
 			
 			[Bindable]
 			public var languages:Array = null;
@@ -41,7 +47,8 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
 			{
-				listProjects();
+				listFormatsResult.token = importService.listFormats(FlexGlobals.topLevelApplication.engineBaseUrl);
+				listProjectsResult.token = projectService.listProjects(FlexGlobals.topLevelApplication.engineBaseUrl);
 				
 				fileRef = new FileReference();
 				fileRef.addEventListener(Event.SELECT, fileRef_select);
@@ -51,10 +58,16 @@
 				fileRef.addEventListener(IOErrorEvent.IO_ERROR, fileRef_error);
 			}
 			
-			protected function listProjects(event:Event=null):void
+			protected function listFormatsResult_resultHandler(event:ResultEvent):void
 			{
-				listProjectsResult.token = projectService.listProjects(FlexGlobals.topLevelApplication.engineBaseUrl);
+				formatsList = listFormatsResult.lastResult.formats;
+				
+				if (formatsList ==  null || formatsList.length < 1) 
+				{
+					Alert.show("No import formats seem to be configured.");
+				} 				
 			}
+
 			
 			protected function listProjectsResult_resultHandler(event:ResultEvent):void
 			{
@@ -63,11 +76,7 @@
 				if (projectsList ==  null || projectsList.length < 1) 
 				{
 					Alert.show("Please configure at least one project first.");
-				} else {
-					
-//					project = Project(projectsList.getItemAt(0));
-				}
-				
+				} 				
 			}
 			
 			
@@ -110,7 +119,7 @@
 			private function fileRef_select(evt:Event):void {
 				try {
 					message.message = fileRef.name + " size: " + numberFormatter.format(fileRef.size) + "bytes";
-					fileRef.upload(new URLRequest(FILE_UPLOAD_URL + "?delimiter=" + delimiter.selectedItem));
+					fileRef.upload(new URLRequest(FILE_UPLOAD_URL + "?formatId=" + formatId + "&delimiter=" + delimiter.selectedItem));
 					currentState = "state2";
 				} catch (err:Error) {
 					message.errorMessage = "ERROR: zero-byte file";					
@@ -178,6 +187,12 @@
 				// TODO Auto-generated method stub
 			}
 			
+			protected function formatSelectBox_changeHandler(event:IndexChangeEvent):void
+			{
+				this.formatId = formatSelectBox.selectedItem.id;
+				
+			}
+			
 		]]>
 		
 	</fx:Script>
@@ -192,7 +207,9 @@
 		<mx:NumberFormatter id="numberFormatter" />
 		<translationservice:TranslationService id="translationService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
 		<s:CallResponder id="addTranslationResult" result="addTranslationResult_resultHandler(event)" fault="addTranslationResult_faultHandler(event)"/>
+		
 		<importservice:ImportService id="importService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<s:CallResponder id="listFormatsResult" result="listFormatsResult_resultHandler(event)"/>
 		
 		<projectservice:ProjectService id="projectService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
 		<s:CallResponder id="listProjectsResult" result="listProjectsResult_resultHandler(event)"/>
@@ -202,9 +219,12 @@
 	<s:HGroup verticalAlign="middle" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">	
 		
 		<!-- 1. SELECT THE FILE and DELIMITER -->
-		<s:Label fontWeight="bold" text="Field delimiter" includeIn="state1"/>			
-		<s:ComboBox dataProvider="{delimiters}" id="delimiter" width="60" includeIn="state1"/>
-		<s:Button label="select a file" id="btnSelectFile"  click="btnSelectFile_clickHandler(event)"  fontWeight="bold" includeIn="state1"/>
+		<s:Label fontWeight="bold" text="File Format" includeIn="state1"/>
+		<s:DropDownList id="formatSelectBox" dataProvider="{formatsList}" change="formatSelectBox_changeHandler(event)" labelField="id" includeIn="state1" />
+		
+		<s:Label fontWeight="bold" text="Field delimiter" includeIn="state1" visible="{this.formatId == 'csv'}"/>			
+		<s:DropDownList dataProvider="{delimiters}" id="delimiter" width="60" includeIn="state1" visible="{this.formatId == 'csv'}"/>
+		<s:Button label="select a file" id="btnSelectFile"  click="btnSelectFile_clickHandler(event)"  fontWeight="bold" includeIn="state1" enabled="{this.formatId != null}"/>
 		
 		<!-- 2. WAIT DURING UPLOAD -->
 		<s:Label id="fileinfoLabel" text="uploading ... size 234" includeIn="state2"/>
@@ -214,10 +234,10 @@
 		
 		<!-- 3. SELECT PROJECT, BUNDLE AND LANGUAGE -->
 		<s:Label fontWeight="bold" text="Project" includeIn="state3"/>
-		<s:ComboBox id="projectSelectBox" dataProvider="{projectsList}" labelField="name" change="projectSelectBox_changeHandler(event)" includeIn="state3"/>
+		<s:DropDownList id="projectSelectBox" dataProvider="{projectsList}" labelField="name" change="projectSelectBox_changeHandler(event)" includeIn="state3"/>
 		
 		<s:Label fontWeight="bold" text="Bundle" includeIn="state3"/>
-		<s:ComboBox id="bundleList" dataProvider="{_project.bundleList}" labelField="name" includeIn="state3"/>
+		<s:DropDownList id="bundleList" dataProvider="{_project.bundleList}" labelField="name" includeIn="state3"/>
 		
 		<s:Label fontWeight="bold" text="Language" includeIn="state3"/>
 		<components:LanguageSelectBox id="languageSelectBox" languages="{languages}" width="100%"  language="00" includeIn="state3"/>
@@ -230,7 +250,7 @@
 	<components:MessageBox  id="message" />
 	
 	<mx:DataGrid id="previewGrid" width="100%" height="100%" includeIn="state3" />
-	<mx:VBox width="100%" height="100%" horizontalAlign="center" includeIn="state1" backgroundColor="#F9F9F9" color="#666666">
+	<mx:VBox width="100%" height="100%" horizontalAlign="center" includeIn="state1" backgroundColor="#F9F9F9" color="#666666" visible="{this.formatId == 'csv'}">
 		<mx:Spacer height="5" />
 		<s:Label  text="You can import simple text files for each language. They must have the following format:"/>
 		<s:Label fontWeight="bold" text="keyDELIMITERvalue"/>

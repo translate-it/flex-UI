@@ -19,7 +19,7 @@
 		<link>
 			<name>bin-debug</name>
 			<type>2</type>
-			<location>C:/Users/admin/Documents/GitHub/translate-it/translate-it/war/flex_debug</location>
+			<location>C:/Users/rothe/Documents/GitHub/server/war/flex_debug</location>
 		</link>
 		<link>
 			<name>bin-release</name>
@@ -29,12 +29,12 @@
 		<link>
 			<name>bin-release1</name>
 			<type>2</type>
-			<location>C:/Users/admin/Documents/GitHub/translate-it/translate-it/war/flex</location>
+			<location>C:/Users/rothe/Documents/GitHub/server/war/flex</location>
 		</link>
 		<link>
 			<name>bin-release2</name>
 			<type>2</type>
-			<location>C:/Users/admin/Documents/GitHub/translate-it/translate-it/war/translate-it-flex</location>
+			<location>C:/Users/rothe/Documents/GitHub/server/war/translate-it-flex</location>
 		</link>
 	</linkedResources>
 </projectDescription>

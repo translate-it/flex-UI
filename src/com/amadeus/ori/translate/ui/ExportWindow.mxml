@@ -65,7 +65,7 @@
 			</s:HGroup>					
 		</s:FormItem>
 		<s:FormItem label="Bundle" visible="{!typeAMAK.selected}" fontWeight="bold">
-			<s:ComboBox 	id="bundleList" 							
+			<s:DropDownList 	id="bundleList" 							
 							dataProvider="{project.bundleList}" 
 							labelField="name" height="23" selectedIndex="1"/>
 		</s:FormItem>
