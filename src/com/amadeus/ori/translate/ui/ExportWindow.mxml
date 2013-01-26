@@ -32,16 +32,25 @@
 			
 			private function createPackage():void
 			{
-				var url:String = "http://" + FlexGlobals.topLevelApplication.engineBaseUrl;
+				var url:String = "http://" + FlexGlobals.topLevelApplication.engineBaseUrl + "/process/export/";
 				
-				if(typeXLIFF.selected){
-					url += "/process/export/iphone?bundle=" + bundleList.selectedItem.name + "&projectId=" + project.id;
-				}else if(typeAMAK.selected){						
-				     //export fo iphone
-				     url += "/process/export/package?projectId=" + project.id;
-				}else if(typeIOS.selected){						
-					 url += "/process/export/xliff?bundle=" + bundleList.selectedItem.name + "&projectId=" + project.id;
+				if(typeIOS.selected){
+					url += "ios";
+				}else if(typePROPERTIES.selected){		
+				     url += "java";
+				}else if(typeJSON.selected){						
+					 url += "json";
+				}else if(typeANDROID.selected){						
+					url += "android";
 				}	
+				
+				url += "?projectId=" + project.id;
+				
+				if (bundleList.selectedItem != null) 
+				{
+					url += "&bundle=" + bundleList.selectedItem;
+				}
+				
 				navigateToURL(new URLRequest(url));
 			    close(null);
 			}			
@@ -58,13 +67,14 @@
 		<s:FormItem label="File Type" fontWeight="bold">
 			<s:HGroup>				
 				<s:VGroup>
-					<s:RadioButton id="typeXLIFF" label="XLIFF" groupName="type" selected="true" />
-					<s:RadioButton id="typeAMAK" label="AMAK" groupName="type"/>
+					<s:RadioButton id="typeJSON" label="JSON" groupName="type" selected="true" />
+					<s:RadioButton id="typePROPERTIES" label="properties file (key=value)" groupName="type"/>
+					<s:RadioButton id="typeANDROID" label="Android"  groupName="type"   />	
 					<s:RadioButton id="typeIOS" label="iOS"  groupName="type"   />					
 				</s:VGroup>
 			</s:HGroup>					
 		</s:FormItem>
-		<s:FormItem label="Bundle" visible="{!typeAMAK.selected}" fontWeight="bold">
+		<s:FormItem label="Bundle" visible="{!typePROPERTIES.selected}" fontWeight="bold">
 			<s:DropDownList 	id="bundleList" 							
 							dataProvider="{project.bundleList}" 
 							labelField="name" height="23" selectedIndex="1"/>
